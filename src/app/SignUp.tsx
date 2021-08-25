@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Link, useHistory } from "react-router-dom";
-import { AiFillEye } from "react-icons/ai";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { StyledForm } from "../styledComponents/styled";
 import { useAppDispatch, useAppSelector } from "../common/hooks";
 import { dropStatus, signUpUser } from "../features/signupSlice";
 import { useEffect } from "react";
 import { IconContext } from "react-icons";
-
 export interface FormValuesI {
   fullName: string;
   email: string;
@@ -95,7 +94,7 @@ const SignUp = () => {
           onBlur={formik.handleBlur}
           value={formik.values.password}
         />
-        <AiFillEye onClick={togglePass} />
+          {!toggleEye ? <AiFillEye onClick={togglePass} /> : <AiFillEyeInvisible onClick={togglePass} />}
         {formik.touched.password && formik.errors.password ? (
           <div>{formik.errors.password}</div>
         ) : null}

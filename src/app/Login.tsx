@@ -5,7 +5,8 @@ import { IconContext } from "react-icons/lib";
 import { StyledForm } from "../styledComponents/styled";
 import { useAppDispatch, useAppSelector } from "../common/hooks";
 import { dropStateRequest, loginUser } from "../features/loginSlice";
-import { AiFillEye } from "react-icons/ai";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { getUserProfile } from "../features/userSlice";
 
 export interface LoginFormValuesI {
   email: string;
@@ -15,21 +16,21 @@ export interface LoginFormValuesI {
 const Login: React.FC = () => {
   const history = useHistory();
   const dispatch = useAppDispatch();
-  const isAuth = useAppSelector((state) => state.login.auth);
+  const loginSuccess = useAppSelector((state) => state.login.isSuccess);
   const errorLogin = useAppSelector((state) => state.login.error);
   const initialValues: LoginFormValuesI = { email: "", password: "" };
   const [toggleEye, setToggleEye] = useState<boolean>(false);
   const togglePass = (): void => {
     setToggleEye(!toggleEye ? true : false);
-    console.log(toggleEye);
   };
 
   useEffect(() => {
-    if (isAuth) {
+    if (loginSuccess) {
       history.push("/");
       dispatch(dropStateRequest());
+      dispatch(getUserProfile());
     }
-  }, [isAuth]);
+  }, [loginSuccess]);
 
   const formik = useFormik({
     initialValues,
@@ -65,7 +66,11 @@ const Login: React.FC = () => {
           onBlur={formik.handleBlur}
           value={formik.values.password}
         />{" "}
-        <AiFillEye onClick={togglePass} />
+        {!toggleEye ? (
+          <AiFillEye onClick={togglePass} />
+        ) : (
+          <AiFillEyeInvisible onClick={togglePass} />
+        )}
         {formik.touched.password && formik.errors.password ? (
           <div>{formik.errors.password}</div>
         ) : null}

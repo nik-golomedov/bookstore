@@ -52,14 +52,46 @@ export const StyledForm = styled.form`
   }
 `;
 
-export const ModalLogin = styled.li`
-  display: absolute;
-  top: 50%;
-  left: 50%;
-  cursor: pointer;
-`;
+export const StyledBookCard = styled.div`
+  display:flex;
+  flex-flow:column;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  width:200px;
+  height:150px;
+  border:1px solid #333;
+  margin: 10px;
+`
+export const StyledFullSizeBookCard = styled.div`
+margin:0 auto;
+width:80%;
+display:flex;
 
-export const modalRegister = styled.li`
-  margin: 0 50px 0 0;
-  cursor: pointer;
-`;
+flex-flow:row;
+& > .book-section {
+  display: flex;
+  flex-flow:column;
+  width:50%;
+}
+.book-section > div {
+  margin: 10px;
+}
+`
+export const StyledAside = styled.aside`
+width:100%;
+display:flex;
+justify-content:center;
+&>div {
+  width:200px;
+  height: 25px;
+  border:1px solid #333;
+  border-radius:14px;
+  text-align:center;
+  background-color:aqua;
+  cursor:pointer;
+}
+.break-sort {
+  background-color:white;
+}
+`

@@ -14,12 +14,12 @@ export interface initialStateSignI {
 
 export const signUpUser = createAsyncThunk(
   "signUp/signUpUser",
-  async (formValues: FormValuesI) => {
+  async (formValues: FormValuesI,thunkAPI) => {
     try {
       const response = await axios.post("/registration", formValues);
       return response.data;
     } catch (error) {
-      console.log(error);
+      return thunkAPI.rejectWithValue(error.response.data)
     }
   }
 );

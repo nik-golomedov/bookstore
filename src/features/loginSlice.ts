@@ -6,25 +6,23 @@ import { initialStateSignI } from "./signupSlice";
 
 export const loginUser = createAsyncThunk(
   "login/loginUser",
-  async (formValues: LoginFormValuesI) => {
+  async (formValues: LoginFormValuesI,thunkAPI) => {
     try {
       const response = await axios.post("/login", formValues);
       return response.data;
     } catch (error) {
-      console.log(error);
+      return thunkAPI.rejectWithValue(error.response.data)
     }
   }
 );
 interface initialStateSignInI extends initialStateSignI {
-    auth:boolean
 }
 const initialState: initialStateSignInI = {
   status: "",
   isFetching: false,
   isSuccess: false,
   isError: false,
-  error: null,
-  auth:false
+  error: null
 };
 
 const loginSlice = createSlice({
@@ -38,13 +36,12 @@ const loginSlice = createSlice({
       state.error=null
       state.status = "";
     },
-    auth(state) {
-    state.auth = false   
-    }
   },
   extraReducers: (builder) => {
     builder.addCase(loginUser.pending, (state, action) => {
       state.isFetching = true;
+      state.isError = false;
+      state.isSuccess = false
       state.status = "";
     }),
       builder.addCase(loginUser.fulfilled, (state, action) => {
@@ -52,13 +49,7 @@ const loginSlice = createSlice({
         state.isError = false;
         
         if (action.payload.token) {
-          localStorage.setItem("isAuth", action.payload.token);
-          
-          if (localStorage.getItem("isAuth")) {
-              
-              state.auth=true
-          }
-          
+          localStorage.setItem("isAuth", action.payload.token);   
           state.isSuccess = true;
           state.status = "Success";
         } else {
@@ -74,6 +65,6 @@ const loginSlice = createSlice({
   },
 });
 
-export const {dropStateRequest, auth} = loginSlice.actions
+export const {dropStateRequest} = loginSlice.actions
 
 export default loginSlice.reducer;

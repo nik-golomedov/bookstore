@@ -1,30 +1,21 @@
 import axios from "axios";
 
- const axiosBase = axios.create({
+import { clearUser } from "../features/userSlice";
+
+const axiosBase = axios.create({
   baseURL: "http://localhost:8000/users",
 });
 
-export default axiosBase
-
-axios.interceptors.request.use(function (config) {
-  {
-    headers: { Authorization: `Bearer ${localStorage.getItem("isAuth")}` }
+axiosBase.interceptors.request.use(
+  function (config) {
+    const token = localStorage.getItem("isAuth");
+    config.headers.Authorization = token ? ` Bearer ${token}` : null;
+    return config;
+  },
+  function (error) {
+    // Do something with request error
+    return Promise.reject(error);
   }
-  return config;
-}, function (error) {
-  // Do something with request error
-  return Promise.reject(error);
-});
+);
 
-// Add a response interceptor
-axios.interceptors.response.use(function (response) {
-
-  return response;
-}, function (error) {
-
-  return Promise.reject(error);
-});
-
-// axios.interceptors
-// sleep
-// status401 logoutuser
+export default axiosBase;

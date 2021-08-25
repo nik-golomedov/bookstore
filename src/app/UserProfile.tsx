@@ -11,17 +11,16 @@ interface UserI {
 
 const UserProfile:React.FC = () => {
   const dispatch = useAppDispatch();
-  const userProfile:UserI = useAppSelector((state) => state.user.data);
-  console.log(userProfile)
+  const userProfile:UserI | null = useAppSelector((state) => state.user.user);
   useEffect(() => {
     dispatch(getUserProfile());
   }, [localStorage.getItem("isAuth")]);
   return (
     <div>
       <div></div>
-      <div>{userProfile.fullName}</div>
+      {userProfile && (<><div>{userProfile.fullName}</div>
       <div>{userProfile.email}</div>
-      <div>{userProfile.dob?.slice(0,10)}</div>
+      <div>{userProfile.dob?.slice(0,10)}</div></>)}
     </div>
   );
 };

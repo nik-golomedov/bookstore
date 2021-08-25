@@ -1,26 +1,42 @@
 import React from "react";
 import { AiOutlineStar } from "react-icons/ai";
 import { BiUserCircle } from "react-icons/bi";
-import { GrLogout } from "react-icons/gr";
+import { GrLogin, GrLogout } from "react-icons/gr";
 import { Link, useHistory } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../common/hooks";
-import { auth } from "../features/loginSlice";
+import { clearUser } from "../features/userSlice";
 import { StyledHeader, StyledListItem } from "../styledComponents/styled";
 
 const Header: React.FC = () => {
-  const isAuth = useAppSelector(state=>state.login.auth)
-  const dispatch = useAppDispatch()
-  const history = useHistory()
+  const isAuth = useAppSelector((state) => state.user?.user);
+  const dispatch = useAppDispatch();
+  const history = useHistory();
 
   const handleClick = (): void => {
     localStorage.removeItem("isAuth");
-    dispatch(auth())
-    history.push("/login")
+    dispatch(clearUser());
+    history.push("/login");
   };
 
   return (
     <StyledHeader>
-      {isAuth &&<> <Link to="/profile" ><StyledListItem>Profile</StyledListItem></Link><Link to="/secret"><StyledListItem>Secret</StyledListItem></Link></> }
+      {isAuth && (
+        <>
+          {" "}
+          <Link to="/">
+            <StyledListItem>Main Page</StyledListItem>
+          </Link>
+          <Link to="/addbook">
+            <StyledListItem>Add Book</StyledListItem>
+          </Link>
+          <Link to="/profile">
+            <StyledListItem>Profile</StyledListItem>
+          </Link>
+          <Link to="/secret">
+            <StyledListItem>Secret</StyledListItem>
+          </Link>
+        </>
+      )}
       {isAuth ? (
         <StyledListItem>
           <GrLogout onClick={handleClick} />
@@ -28,7 +44,7 @@ const Header: React.FC = () => {
       ) : (
         <Link to="/login">
           <StyledListItem>
-            <BiUserCircle />
+            <GrLogin />
           </StyledListItem>
         </Link>
       )}
