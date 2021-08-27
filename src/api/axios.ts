@@ -1,5 +1,4 @@
-import axios from "axios";
-
+import axios, { AxiosInstance } from "axios";
 import { clearUser } from "../features/userSlice";
 
 const axiosBase = axios.create({
@@ -17,5 +16,18 @@ axiosBase.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+export const initResponseInt = (store:any) => {
+  axiosBase.interceptors.response.use(
+    function (response) {
+      return response;
+    },
+    function (error) {
+      store.dispatch(clearUser());
+      localStorage.removeItem("isAuth");
+      return Promise.reject(error);
+    }
+  );
+};
 
 export default axiosBase;

@@ -48,10 +48,11 @@ const Header: React.FC = () => {
           </StyledListItem>
         </Link>
       )}
-
-      <StyledListItem>
-        <AiOutlineStar />
-      </StyledListItem>
+      <Link to="/favourite">
+        <StyledListItem>
+          <AiOutlineStar />
+        </StyledListItem>
+      </Link>
     </StyledHeader>
   );
 };

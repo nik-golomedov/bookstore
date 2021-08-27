@@ -5,9 +5,11 @@ export const StyledHeader = styled.header`
   display: flex;
   justify-content: flex-end;
   margin: 150px 100px 10px;
-  & a:link,a:visited,a:active {
-    text-decoration:none;
-    color:black;
+  & a:link,
+  a:visited,
+  a:active {
+    text-decoration: none;
+    color: black;
   }
 `;
 
@@ -50,48 +52,82 @@ export const StyledForm = styled.form`
     cursor:pointer;
  
   }
+}
 `;
 
 export const StyledBookCard = styled.div`
-  display:flex;
-  flex-flow:column;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  width:200px;
-  height:150px;
-  border:1px solid #333;
-  margin: 10px;
-`
-export const StyledFullSizeBookCard = styled.div`
-margin:0 auto;
-width:80%;
-display:flex;
-
-flex-flow:row;
-& > .book-section {
   display: flex;
-  flex-flow:column;
-  width:50%;
-}
-.book-section > div {
+  flex-flow: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 200px;
+  min-height: 400px;
+  border: 1px solid #888;
   margin: 10px;
-}
-`
+  background-color:#f9f9f9;
+  text-align: center;
+  padding:10px;
+  * {
+  }
+  & > * {
+    margin-bottom: 5px;
+  }
+
+  img {
+    object-fit: fill;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+  .image-container {
+    width: 200px;
+    height: 300px;
+  }
+`;
+export const StyledFullSizeBookCard = styled.div`
+  margin: 0 auto;
+  width: 80%;
+  display: flex;
+  flex-flow: row;
+  & > img {
+    width: 100%;
+  }
+   .book-section {
+    display: flex;
+    flex-flow: column;
+    width: 600px;
+    margin:10px;
+  }
+  .book-section:first-of-type {
+    display:block;
+    height:600px;
+  }
+  .book-section img {
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+  }
+  .book-section > div {
+    margin: 10px;
+  }
+`;
 export const StyledAside = styled.aside`
-width:100%;
-display:flex;
-justify-content:center;
-&>div {
-  width:200px;
-  height: 25px;
-  border:1px solid #333;
-  border-radius:14px;
-  text-align:center;
-  background-color:aqua;
-  cursor:pointer;
-}
-.break-sort {
-  background-color:white;
-}
-`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  & > div {
+    width: 200px;
+    height: 25px;
+    border: 1px solid #333;
+    border-radius: 14px;
+    text-align: center;
+    color: white;
+    background-color: #333;
+    cursor: pointer;
+  }
+
+`;
+export const StyledSection = styled.section`
+  display: flex;
+  flex-flow: wrap;
+`;

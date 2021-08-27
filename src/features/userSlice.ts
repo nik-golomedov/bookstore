@@ -12,9 +12,13 @@ export const getUserProfile = createAsyncThunk(
     }
   }
 );
-
+interface UserI {
+  id:number
+  fullName:string
+  dob:string
+}
 interface UserProfileI {
-  user: object | null;
+  user: UserI | null;
   isLoading: boolean;
   isError: boolean;
   isSuccess: boolean;

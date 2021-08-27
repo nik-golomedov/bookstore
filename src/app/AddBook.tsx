@@ -3,14 +3,14 @@ import React, { ChangeEventHandler, SyntheticEvent } from "react";
 import { useAppDispatch } from "../common/hooks";
 import { addBook } from "../features/bookSlice";
 import { StyledForm } from "../styledComponents/styled";
-
+import randomstring from "randomstring";
 export interface initialValuesAddBookI {
   title: string;
   author: string;
   description: string;
   price: number;
   snippet?: string;
-  header?: string;
+  file?: File | null;
 }
 const initialValues: initialValuesAddBookI = {
   title: "",
@@ -18,23 +18,23 @@ const initialValues: initialValuesAddBookI = {
   description: "",
   price: 0,
   snippet: "",
-  header: "",
+  file: null,
 };
 
 const AddBook = () => {
   const dispatch = useAppDispatch();
+  let randString: string = randomstring.generate();
   const formik = useFormik({
     initialValues,
     onSubmit: (values: initialValuesAddBookI) => {
       dispatch(addBook(values));
-      console.log({
-        values,
-      });
       formik.resetForm();
     },
   });
-  const handleHeaderChange = (event: any): void => {
-    formik.setFieldValue("header", event.currentTarget.files[0]);
+  const handleHeaderChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    formik.setFieldValue("file", (event.currentTarget.files as FileList)[0]);
   };
   return (
     <div>
@@ -48,9 +48,6 @@ const AddBook = () => {
           onBlur={formik.handleBlur}
           value={formik.values.title}
         />
-        {formik.touched.title && formik.errors.title ? (
-          <div>{formik.errors.title}</div>
-        ) : null}
 
         <label htmlFor="author">Author</label>
         <input
@@ -61,9 +58,6 @@ const AddBook = () => {
           onBlur={formik.handleBlur}
           value={formik.values.author}
         />
-        {formik.touched.author && formik.errors.author ? (
-          <div>{formik.errors.author}</div>
-        ) : null}
 
         <label htmlFor="description">Description</label>
         <input
@@ -74,9 +68,6 @@ const AddBook = () => {
           onBlur={formik.handleBlur}
           value={formik.values.description}
         />
-        {formik.touched.description && formik.errors.description ? (
-          <div>{formik.errors.description}</div>
-        ) : null}
 
         <label htmlFor="price">Price</label>
         <input
@@ -87,9 +78,6 @@ const AddBook = () => {
           onBlur={formik.handleBlur}
           value={formik.values.price}
         />
-        {formik.touched.price && formik.errors.price ? (
-          <div>{formik.errors.price}</div>
-        ) : null}
 
         <label htmlFor="snippet">Snippet</label>
         <input
@@ -101,18 +89,16 @@ const AddBook = () => {
           value={formik.values.snippet}
         />
 
-        {/* <label htmlFor="header">Header</label>
+        <label htmlFor="file">Header</label>
         <input
-          id="header"
-          name="header"
+          id="file"
+          name="file"
           type="file"
-          onChange={(event:any)=>{
-            formik.setFieldValue("header", event.currentTarget.files[0])}}
-          value={formik.values.header}
+          onChange={handleHeaderChange}
         />
-        {formik.touched.header && formik.errors.header ? (
-          <div>{formik.errors.header}</div>
-        ) : null} */}
+        {formik.touched.file && formik.errors.file ? (
+          <div>{formik.errors.file}</div>
+        ) : null}
         <button type="submit">Submit</button>
         {status}
       </StyledForm>

@@ -13,23 +13,26 @@ import { useAppDispatch } from "../common/hooks";
 import MainPage from "./MainPage";
 import AddBook from "./AddBook";
 import BookPage from "./Book";
+import Favourites from "./Favourites";
 
 const App = () => {
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   useEffect(() => {
-    dispatch(getUserProfile())
-  }, [])
+    dispatch(getUserProfile());
+  }, []);
   return (
     <main className="App">
       <Router>
         <Header></Header>
         <Switch>
-          <SignRoute path="/signup" exact component={SignUp}/>
-          <SignRoute path="/login" exact component={Login}/>
+          <SignRoute path="/signup" exact component={SignUp} />
+          <SignRoute path="/login" exact component={Login} />
           <ProtectedRoute path="/profile" exact component={UserProfile} />
           <ProtectedRoute path="/secret" exact component={SaveComponent} />
-          <ProtectedRoute path="/addbook" exact component = {AddBook} />
+          <ProtectedRoute path="/addbook" exact component={AddBook} />
+          <ProtectedRoute path="/favourite" exact component={Favourites} />
           <ProtectedRoute path="/:id" exact component={BookPage} />
+
           <Route path="/" exact component={MainPage}></Route>
         </Switch>
       </Router>
