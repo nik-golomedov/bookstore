@@ -1,26 +1,30 @@
 import React from "react";
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../common/hooks";
 import { getFavourites } from "../features/bookSlice";
-import { StyledSection } from "../styledComponents/styled";
+import { StyledBookCard, StyledSection } from "../styledComponents/styled";
 
-const Favourites:React.FC = () => {
-  const dispatch = useAppDispatch()
-  const userId:number | null = useAppSelector(state=>state.user.user && state.user.user.id)
-  // const favBooks = useAppSelector(state=>state.books.books && state.books.books.filter(item=>item.id ===))
-  const favList = useAppSelector(state=>state.books.fav)
+const Favourites: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const userId: number | null = useAppSelector(
+    (state) => state.user.user && state.user.user.id
+  );
+  const favList = useAppSelector((state) => state.books.fav.books);
+
   useEffect(() => {
-    dispatch(getFavourites(userId))
-  }, [])
-  console.log(favList)
-  return <div>
-    <StyledSection>
-        {/* {books &&
-          sortedBooks.map((item) => (
+    dispatch(getFavourites(userId));
+  }, []);
+
+  return (
+    <div>
+      <StyledSection>
+        {favList &&
+          favList.map((item: any) => (
             <StyledBookCard key={item.id}>
               <Link to={`/${item.id}`}>
                 <div className="image-container">
-                  <img src={item.header} alt={item.title} />
+                  <img src={item.image} alt={item.title} />
                 </div>
               </Link>
               <div>
@@ -38,9 +42,10 @@ const Favourites:React.FC = () => {
                 </b>
               </div>
             </StyledBookCard>
-          ))} */}
+          ))}
       </StyledSection>
-  </div>;
+    </div>
+  );
 };
 
 export default Favourites;

@@ -1,5 +1,3 @@
-
-
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -21,7 +19,10 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
-
+.App {
+  width:1400px;
+  margin:0 auto
+}
 .App-link {
   color: #61dafb;
 }

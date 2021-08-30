@@ -1,5 +1,5 @@
 import React from "react";
-import { AiOutlineStar } from "react-icons/ai";
+import { AiOutlineSearch, AiOutlineStar } from "react-icons/ai";
 import { BiUserCircle } from "react-icons/bi";
 import { GrLogin, GrLogout } from "react-icons/gr";
 import { Link, useHistory } from "react-router-dom";
@@ -20,39 +20,31 @@ const Header: React.FC = () => {
 
   return (
     <StyledHeader>
-      {isAuth && (
-        <>
-          {" "}
-          <Link to="/">
-            <StyledListItem>Main Page</StyledListItem>
-          </Link>
-          <Link to="/addbook">
-            <StyledListItem>Add Book</StyledListItem>
-          </Link>
-          <Link to="/profile">
-            <StyledListItem>Profile</StyledListItem>
-          </Link>
-          <Link to="/secret">
-            <StyledListItem>Secret</StyledListItem>
-          </Link>
-        </>
-      )}
+      <div className="header-logo">Bookstore</div>
+      <div className="header-search"><input placeholder={"Поиск..."}/><button><AiOutlineSearch/></button></div>
+      <div className="header-nav">
       {isAuth ? (
+        <>
         <StyledListItem>
           <GrLogout onClick={handleClick} />
         </StyledListItem>
+          <Link to="/favourite">
+        <StyledListItem>
+          <AiOutlineStar />
+        </StyledListItem>
+      </Link>
+      </>
       ) : (
+        <>
         <Link to="/login">
           <StyledListItem>
             <GrLogin />
           </StyledListItem>
         </Link>
+        </>
       )}
-      <Link to="/favourite">
-        <StyledListItem>
-          <AiOutlineStar />
-        </StyledListItem>
-      </Link>
+    
+      </div>
     </StyledHeader>
   );
 };

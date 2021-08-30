@@ -1,9 +1,9 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 
-import signUpReducer from "../features/signupSlice";
-import loginReducer from "../features/loginSlice";
-import userReducer from "../features/userSlice";
-import booksReducer from "../features/bookSlice";
+import signUpReducer from "./signupSlice";
+import loginReducer from "./loginSlice";
+import userReducer from "./userSlice";
+import booksReducer from "./bookSlice";
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import {

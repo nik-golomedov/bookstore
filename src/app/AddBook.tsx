@@ -11,6 +11,7 @@ export interface initialValuesAddBookI {
   price: number;
   snippet?: string;
   file?: File | null;
+  image:string
 }
 const initialValues: initialValuesAddBookI = {
   title: "",
@@ -19,6 +20,7 @@ const initialValues: initialValuesAddBookI = {
   price: 0,
   snippet: "",
   file: null,
+  image:""
 };
 
 const AddBook = () => {

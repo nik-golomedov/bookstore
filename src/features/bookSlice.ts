@@ -4,16 +4,19 @@ import axios from "../api/axios";
 import { initialValuesAddBookI } from "../app/AddBook";
 import { addReviewI } from "../app/Book";
 import { BooksI } from "../app/MainPage";
+import { UserI } from "./userSlice";
 
 export interface BookI extends initialValuesAddBookI {
   id: number;
 }
 interface ReviewI {
-  review?:string;
-  id?:number
+  text?: string;
+  id?: number;
+  user?: UserI;
+  createdAt: string;
 }
 export interface InitialStateGetBooksI {
-  fav:any
+  fav: any;
   books: Array<BooksI>;
   review: Array<ReviewI>;
   isFetching: boolean;
@@ -55,6 +58,7 @@ export const getBooks = createAsyncThunk("book/getBooks", async () => {
     console.log(error);
   }
 });
+
 export const addReview = createAsyncThunk(
   "book/addReview",
   async (value: addReviewI, thunkAPI) => {
@@ -80,15 +84,18 @@ export const getReview = createAsyncThunk(
 );
 
 interface AddFavI {
-  userId:number |null
-  bookId:number | null
+  userId: number | null;
+  bookId: number | null;
 }
 
 export const addFavourites = createAsyncThunk(
   "book/addFavourites",
-  async ({ userId, bookId}:AddFavI,  thunkAPI) => {
+  async ({ userId, bookId }: AddFavI, thunkAPI) => {
     try {
-      const response = await axios.post("/books/addfavourites",{ userId, bookId});
+      const response = await axios.post("/books/addfavourites", {
+        userId,
+        bookId,
+      });
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -107,9 +114,30 @@ export const getFavourites = createAsyncThunk(
     }
   }
 );
+export interface RatingI {
+  value: string;
+  userId: string;
+  bookId: string;
+}
+
+export const addRating = createAsyncThunk(
+  "book/addRating",
+  async ({ value, userId, bookId }: RatingI, thunkAPI) => {
+    try {
+      const response = await axios.post("/books/addrating", {
+        value,
+        userId,
+        bookId,
+      });
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
 
 const initialState: InitialStateGetBooksI = {
-  fav:[],
+  fav: [],
   books: [],
   review: [],
   isFetching: false,
@@ -121,7 +149,11 @@ const initialState: InitialStateGetBooksI = {
 const booksSlice = createSlice({
   name: "books",
   initialState,
-  reducers: {},
+  reducers: {
+    addCurrentReview(state, action) {
+      state.review && state.review.push(action.payload);
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(addBook.pending, (state, action) => {
       state.isFetching = true;
@@ -167,22 +199,24 @@ const booksSlice = createSlice({
         state.isError = true;
         state.error = action.payload;
       });
-      builder.addCase(getFavourites.pending, (state, action) => {
-        state.isFetching = true;
+    builder.addCase(getFavourites.pending, (state, action) => {
+      state.isFetching = true;
+    }),
+      builder.addCase(getFavourites.fulfilled, (state, action) => {
+        state.fav = action.payload;
+        state.isFetching = false;
+        state.isError = false;
+        state.isSuccess = true;
       }),
-        builder.addCase(getFavourites.fulfilled, (state, action) => {
-          state.fav = action.payload;
-          state.isFetching = false;
-          state.isError = false;
-          state.isSuccess = true;
-        }),
-        builder.addCase(getFavourites.rejected, (state, action) => {
-          state.isFetching = false;
-          state.isSuccess = false;
-          state.isError = true;
-          state.error = action.payload;
-        });
+      builder.addCase(getFavourites.rejected, (state, action) => {
+        state.isFetching = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.error = action.payload;
+      });
   },
 });
 
 export default booksSlice.reducer;
+
+export const { addCurrentReview } = booksSlice.actions;

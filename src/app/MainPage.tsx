@@ -17,7 +17,6 @@ const MainPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const [sort, setSort] = useState<string>("");
   const books: BooksI[] = useAppSelector((state) => state.books.books);
-  console.log(books)
   const sorted = () => {
     const sortPrice = [...books].sort((a, b) => b.price - a.price);
     const sortName = [...books].sort((a, b) => {
@@ -65,7 +64,7 @@ const MainPage: React.FC = () => {
             <StyledBookCard key={item.id}>
               <Link to={`/${item.id}`}>
                 <div className="image-container">
-                  <img src={item.header} alt={item.title} />
+                  <img src={item.image} alt={item.title} />
                 </div>
               </Link>
               <div>

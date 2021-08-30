@@ -3,14 +3,55 @@ import styled from "styled-components";
 export const StyledHeader = styled.header`
   font-size: 34px;
   display: flex;
-  justify-content: flex-end;
-  margin: 150px 100px 10px;
+  width:100%;
+  justify-content: space-between;
+  margin: 50px 50px 30px 0;
+  background-color:#26a9e0;
+  padding:40px;
+  color:#eee;
   & a:link,
   a:visited,
   a:active {
     text-decoration: none;
     color: black;
   }
+  & .header-logo {
+    font-family: 'Proza Libre', sans-serif;
+    font-size:44px;
+  }
+  & .header-search {
+    width: 600px;
+  }
+  .header-search input {
+    width:89.362%;
+    height:40px;
+    padding:0 0 0 10px;
+    box-sizing: border-box;
+    margin:0;
+    border:none;
+    border-radius:5px 0 0 5px;
+    font-size:18px;
+    line-height:40px;
+  }
+  .header-search button {
+    display:inline-block;
+    box-sizing: border-box;
+    text-align:center;
+    height: 40px;
+    width: 10.638%;
+    border:none;
+    border-radius:0 5px 5px 0;
+    background-color:#1b75bb;
+    cursor:pointer;
+    color:#eee;
+    font-size:17px;
+    
+  }
+  & .header-nav {
+    display:flex;
+    align-items:center;
+  }
+
 `;
 
 export const StyledListItem = styled.li`
@@ -131,3 +172,28 @@ export const StyledSection = styled.section`
   display: flex;
   flex-flow: wrap;
 `;
+
+export const StyledReview = styled.div`
+  width:600px;
+  height:auto;
+  background-color:#e7e7e7;
+  dislay:flex;
+  flex-flow: column;
+  padding:10px;
+  margin:10px 0 10px 10px;
+  font-size:16px;
+
+  b {
+    padding:0;
+    margin:0;
+  }
+  & * {
+    margin:0 10px 10px 10px;
+  }
+  &> div:first-of-type {
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:30px;
+  }
+`  

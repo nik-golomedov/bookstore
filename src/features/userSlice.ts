@@ -12,7 +12,7 @@ export const getUserProfile = createAsyncThunk(
     }
   }
 );
-interface UserI {
+export interface UserI {
   id:number
   fullName:string
   dob:string
