@@ -20,6 +20,7 @@ const Login: React.FC = () => {
   const errorLogin = useAppSelector((state) => state.login.error);
   const initialValues: LoginFormValuesI = { email: "", password: "" };
   const [toggleEye, setToggleEye] = useState<boolean>(false);
+
   const togglePass = (): void => {
     setToggleEye(!toggleEye ? true : false);
   };
@@ -39,6 +40,7 @@ const Login: React.FC = () => {
       formik.resetForm();
     },
   });
+
   return (
     <StyledForm onSubmit={formik.handleSubmit}>
       <IconContext.Provider

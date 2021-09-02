@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Redirect, RouteProps } from "react-router-dom";
+import { Route, Redirect } from "react-router-dom";
 import { useAppSelector } from "../common/hooks";
 
 const ProtectedRoute: React.FC<{

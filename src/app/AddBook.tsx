@@ -1,47 +1,67 @@
 import { useFormik } from "formik";
-import React, { ChangeEventHandler, SyntheticEvent } from "react";
-import { useAppDispatch } from "../common/hooks";
-import { addBook } from "../features/bookSlice";
-import { StyledForm } from "../styledComponents/styled";
-import randomstring from "randomstring";
+import React, { useEffect } from "react";
+
+import { useAppDispatch, useAppSelector } from "../common/hooks";
+import { addBook, CategoryI, getCategory } from "../features/bookSlice";
+import { StyledButton, StyledForm } from "../styledComponents/styled";
+
 export interface initialValuesAddBookI {
   title: string;
   author: string;
   description: string;
   price: number;
   snippet?: string;
+  creator: number | null;
+  rating: number;
+  category: string;
   file?: File | null;
-  image:string
+  image: string;
 }
+
 const initialValues: initialValuesAddBookI = {
   title: "",
   author: "",
+  creator: null,
   description: "",
-  price: 0,
+  price: 100,
+  rating: 0,
   snippet: "",
+  category: "",
   file: null,
-  image:""
+  image: "",
 };
 
-const AddBook = () => {
+const AddBook: React.FC = () => {
   const dispatch = useAppDispatch();
-  let randString: string = randomstring.generate();
+  const userId: number | null = useAppSelector(
+    (state) => state.user.user && state.user.user.id
+  );
+  const category = useAppSelector(
+    (state) => state.books && state.books.category
+  );
+  
   const formik = useFormik({
     initialValues,
     onSubmit: (values: initialValuesAddBookI) => {
-      dispatch(addBook(values));
+      dispatch(addBook({ ...values, creator: userId }));
       formik.resetForm();
     },
   });
+
   const handleHeaderChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
     formik.setFieldValue("file", (event.currentTarget.files as FileList)[0]);
   };
+
+  useEffect(() => {
+    dispatch(getCategory());
+  }, []);
+
   return (
     <div>
       <StyledForm onSubmit={formik.handleSubmit}>
-        <label htmlFor="title">Title</label>
+        <label htmlFor="title">Название</label>
         <input
           id="title"
           name="title"
@@ -51,7 +71,7 @@ const AddBook = () => {
           value={formik.values.title}
         />
 
-        <label htmlFor="author">Author</label>
+        <label htmlFor="author">Автор</label>
         <input
           id="author"
           name="author"
@@ -61,7 +81,7 @@ const AddBook = () => {
           value={formik.values.author}
         />
 
-        <label htmlFor="description">Description</label>
+        <label htmlFor="description">Описание</label>
         <input
           id="description"
           name="description"
@@ -71,17 +91,36 @@ const AddBook = () => {
           value={formik.values.description}
         />
 
-        <label htmlFor="price">Price</label>
+        <label htmlFor="category">Категория</label>
+        <select
+          id="category"
+          name="category"
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          value={formik.values.category}
+        >
+          <option value="" disabled label="Выберите категорию" />
+          {category &&
+            category.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.value}
+              </option>
+            ))}
+        </select>
+
+        <label htmlFor="price">Цена</label>
         <input
           id="price"
           name="price"
           type="number"
+          min="1"
+          max="9999999"
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           value={formik.values.price}
         />
 
-        <label htmlFor="snippet">Snippet</label>
+        <label htmlFor="snippet">Ознакомительный фрагмент</label>
         <input
           id="snippet"
           name="snippet"
@@ -91,7 +130,7 @@ const AddBook = () => {
           value={formik.values.snippet}
         />
 
-        <label htmlFor="file">Header</label>
+        <label htmlFor="file">Обложка</label>
         <input
           id="file"
           name="file"
@@ -101,7 +140,7 @@ const AddBook = () => {
         {formik.touched.file && formik.errors.file ? (
           <div>{formik.errors.file}</div>
         ) : null}
-        <button type="submit">Submit</button>
+        <StyledButton type="submit">Добавить</StyledButton>
         {status}
       </StyledForm>
     </div>

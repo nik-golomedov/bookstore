@@ -14,22 +14,28 @@ import MainPage from "./MainPage";
 import AddBook from "./AddBook";
 import BookPage from "./Book";
 import Favourites from "./Favourites";
+import SubHeader from "./SubHeader";
+import AddCategory from "./AddCategory";
 
 const App = () => {
   const dispatch = useAppDispatch();
+
   useEffect(() => {
     dispatch(getUserProfile());
   }, []);
+
   return (
     <main className="App">
       <Router>
         <Header></Header>
+       <SubHeader />
         <Switch>
           <SignRoute path="/signup" exact component={SignUp} />
           <SignRoute path="/login" exact component={Login} />
           <ProtectedRoute path="/profile" exact component={UserProfile} />
           <ProtectedRoute path="/addbook" exact component={AddBook} />
           <ProtectedRoute path="/favourite" exact component={Favourites} />
+          <ProtectedRoute path="/addcategory" exact component={AddCategory} />
           <Route path="/:id" exact component={BookPage} />
           <Route path="/" exact component={MainPage}></Route>
         </Switch>

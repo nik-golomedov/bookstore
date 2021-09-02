@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../common/hooks";
 import { getFavourites } from "../features/bookSlice";
-import { StyledBookCard, StyledSection } from "../styledComponents/styled";
+import { StyledBookCard, StyledMainPage, StyledSection } from "../styledComponents/styled";
 
 const Favourites: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -17,10 +17,11 @@ const Favourites: React.FC = () => {
   }, []);
 
   return (
-    <div>
       <StyledSection>
+        <div className="book-container">
         {favList &&
           favList.map((item: any) => (
+           
             <StyledBookCard key={item.id}>
               <Link to={`/${item.id}`}>
                 <div className="image-container">
@@ -42,9 +43,9 @@ const Favourites: React.FC = () => {
                 </b>
               </div>
             </StyledBookCard>
-          ))}
+          
+          ))}  </div>
       </StyledSection>
-    </div>
   );
 };
 

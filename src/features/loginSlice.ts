@@ -15,8 +15,10 @@ export const loginUser = createAsyncThunk(
     }
   }
 );
+
 interface initialStateSignInI extends initialStateSignI {
 }
+
 const initialState: initialStateSignInI = {
   status: "",
   isFetching: false,

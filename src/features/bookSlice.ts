@@ -1,24 +1,41 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import randomstring from "randomstring";
 import axios from "../api/axios";
 import { initialValuesAddBookI } from "../app/AddBook";
+import { AddCategoryI } from "../app/AddCategory";
 import { addReviewI } from "../app/Book";
 import { BooksI } from "../app/MainPage";
 import { UserI } from "./userSlice";
 
-export interface BookI extends initialValuesAddBookI {
+export interface CategoryI {
+  value: string;
   id: number;
 }
+export interface BookI {
+  title: string;
+  author: string;
+  description: string;
+  price: number;
+  snippet?: string;
+  creator: number | null;
+  rating: number;
+  image: string;
+  id: number;
+  category: CategoryI;
+}
+
 interface ReviewI {
   text?: string;
   id?: number;
   user?: UserI;
   createdAt: string;
 }
+
 export interface InitialStateGetBooksI {
   fav: any;
   books: Array<BooksI>;
   review: Array<ReviewI>;
+  filteredBooks: Array<BooksI>;
+  category: Array<CategoryI>;
   isFetching: boolean;
   isSuccess: boolean;
   isError: boolean;
@@ -35,6 +52,8 @@ export const addBook = createAsyncThunk(
       formData.append("author", formValues.author);
       formData.append("description", formValues.description);
       formData.append("price", String(formValues.price));
+      formData.append("creator", String(formValues.creator));
+      formData.append("category", formValues.category);
       if (formValues.snippet) {
         formData.append("snippet", formValues.snippet);
       }
@@ -136,10 +155,50 @@ export const addRating = createAsyncThunk(
   }
 );
 
+export const addCategory = createAsyncThunk(
+  "book/addCategory",
+  async (value: AddCategoryI, thunkAPI) => {
+    try {
+      const response = await axios.post("/books/addcategory", value);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const getCategory = createAsyncThunk("book/getCategory", async () => {
+  try {
+    const response = await axios.get("/books/getcategory");
+    return response.data;
+  } catch (error) {
+     console.log(error);
+  }
+});
+
+export const editBook = createAsyncThunk(
+  "book/editBook",
+  async (values: {
+    description: string;
+    price: number;
+    userId: number | null;
+    snippet: string;
+    bookId:string
+  },thunkAPI) => {
+    try {
+      const response = await axios.patch("/books/editbook", values)
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 const initialState: InitialStateGetBooksI = {
   fav: [],
   books: [],
   review: [],
+  filteredBooks: [],
+  category: [],
   isFetching: false,
   isSuccess: false,
   isError: false,
@@ -174,6 +233,7 @@ const booksSlice = createSlice({
     }),
       builder.addCase(getBooks.fulfilled, (state, action) => {
         state.books = action.payload;
+        state.filteredBooks = action.payload;
         state.isFetching = false;
         state.isError = false;
         state.isSuccess = true;
@@ -209,6 +269,21 @@ const booksSlice = createSlice({
         state.isSuccess = true;
       }),
       builder.addCase(getFavourites.rejected, (state, action) => {
+        state.isFetching = false;
+        state.isSuccess = false;
+        state.isError = true;
+        state.error = action.payload;
+      });
+    builder.addCase(getCategory.pending, (state, action) => {
+      state.isFetching = true;
+    }),
+      builder.addCase(getCategory.fulfilled, (state, action) => {
+        state.category = action.payload;
+        state.isFetching = false;
+        state.isError = false;
+        state.isSuccess = true;
+      }),
+      builder.addCase(getCategory.rejected, (state, action) => {
         state.isFetching = false;
         state.isSuccess = false;
         state.isError = true;
