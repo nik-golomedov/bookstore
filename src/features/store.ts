@@ -4,16 +4,6 @@ import signUpReducer from "./signupSlice";
 import loginReducer from "./loginSlice";
 import userReducer from "./userSlice";
 import booksReducer from "./bookSlice";
-import { persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage";
-import {
-  FLUSH,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-  REHYDRATE,
-} from "redux-persist/es/constants";
 import { initResponseInt } from "../api/axios";
 
 const reducers = combineReducers({
@@ -23,26 +13,14 @@ const reducers = combineReducers({
   books: booksReducer,
 });
 
-interface persistConfigI {
-  key: string;
-  storage: any;
-}
-
-const persistConfig: persistConfigI = {
-  key: "root",
-  storage: storage,
-};
-
-const persistedReducer = persistReducer(persistConfig, reducers);
 
 const store = configureStore({
-  reducer: persistedReducer,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
-    }),
+  reducer: {
+    signUp: signUpReducer,
+    login: loginReducer,
+    user: userReducer,
+    books: booksReducer,
+  },
 });
 
 initResponseInt(store)

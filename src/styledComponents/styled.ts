@@ -5,7 +5,7 @@ export const StyledHeader = styled.header`
   font-size: 34px;
   display: flex;
   width: 100%;
-  box-sizing:border-box;
+  box-sizing: border-box;
   justify-content: space-between;
   margin: 50px 50px 3px 0;
   background-color: #26a9e0;
@@ -227,8 +227,8 @@ export const StyledFullSizeBookCard = styled.div`
     width: 240px;
   }
   .book-author {
-    margin-bottom:10px;
-  } 
+    margin-bottom: 10px;
+  }
   .book-main h1 {
     font-size: 24px;
     line-height: 28px;
@@ -271,21 +271,47 @@ export const StyledButton = styled.button`
   cursor: pointer;
 `;
 export const StyledMainPage = styled.section`
-  display:flex;
-  
-`
+  display: flex;
+  .paginateContainer {
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    backgeound-color: white;
+    padding: 10px;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 4%);
+  }
+  .pageLink {
+    padding: 5px 10px;
+  }
+  .pageLink:hover {
+    box-shadow: inset 0 0 3px #26a9e0;
+
+  }
+  .page {
+    margin: 0 5px;
+  }
+  .activePage {
+  }
+
+  .activeLink {
+    background-color: #26a9e0;
+    border-radius:4px;
+    transition:.2s ease-in;
+    color:white;
+  }
+`;
 export const StyledAside = styled.aside`
   width: 18.5%;
   height: 800px;
   display: flex;
-  flex-flow:column;
-  align-items:flex-start;
+  flex-flow: column;
+  align-items: flex-start;
   justify-content: flex-start;
-  margin:20px 20px 0 10px;
-  border-right:1px solid rgba(0,0,0,.1)
+  margin: 20px 20px 0 10px;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
 `;
 export const StyledSection = styled.div`
-  width:100%;
+  width: 100%;
   display: flex;
   flex-flow: column;
   .book-container {
@@ -362,10 +388,10 @@ export const StyledUserProfile = styled.section`
 `;
 
 interface StyledEditBookI {
- readonly display_none?:boolean
+  readonly display_none?: boolean;
 }
 export const StyledEditBook = styled.div<StyledEditBookI>`
-  display: ${(props)=>props.display_none ? "none" : "absolute"}
+  display: ${(props) => (props.display_none ? "none" : "absolute")}
   width:100%;
   height:100%;
-`
+`;

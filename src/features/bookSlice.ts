@@ -1,10 +1,11 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "../api/axios";
 import { initialValuesAddBookI } from "../app/AddBook";
 import { AddCategoryI } from "../app/AddCategory";
 import { addReviewI } from "../app/Book";
 import { BooksI } from "../app/MainPage";
 import { UserI } from "./userSlice";
+import { SearchI } from "../app/MainPage";
 
 export interface CategoryI {
   value: string;
@@ -29,16 +30,22 @@ interface ReviewI {
   user?: UserI;
   createdAt: string;
 }
-
+interface DataI {
+  books: Array<BooksI>;
+  total: number;
+}
 export interface InitialStateGetBooksI {
   fav: any;
-  books: Array<BooksI>;
+  data: DataI;
+  singleBook: BookI;
   review: Array<ReviewI>;
-  filteredBooks: Array<BooksI>;
+  filter: SearchI;
   category: Array<CategoryI>;
   isFetching: boolean;
   isSuccess: boolean;
   isError: boolean;
+  isSuccessBook:boolean
+  isSuccessRating:boolean;
   error: any;
 }
 
@@ -69,14 +76,31 @@ export const addBook = createAsyncThunk(
   }
 );
 
-export const getBooks = createAsyncThunk("book/getBooks", async () => {
-  try {
-    const response = await axios.get("/books");
-    return response.data;
-  } catch (error) {
-    console.log(error);
+export const getBooks = createAsyncThunk(
+  "book/getBooks",
+  async ({ newFilterSearch }: { newFilterSearch: SearchI }) => {
+    try {
+      const response = await axios.get("/books", {
+        params: { ...newFilterSearch },
+      });
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
   }
-});
+);
+
+export const getBook = createAsyncThunk(
+  "book/getBook",
+  async (id: number, thunkAPI) => {
+    try {
+      const response = await axios.get(`/books/${id}`);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
 
 export const addReview = createAsyncThunk(
   "book/addReview",
@@ -172,21 +196,24 @@ export const getCategory = createAsyncThunk("book/getCategory", async () => {
     const response = await axios.get("/books/getcategory");
     return response.data;
   } catch (error) {
-     console.log(error);
+    console.log(error);
   }
 });
 
 export const editBook = createAsyncThunk(
   "book/editBook",
-  async (values: {
-    description: string;
-    price: number;
-    userId: number | null;
-    snippet: string;
-    bookId:string
-  },thunkAPI) => {
+  async (
+    values: {
+      description: string;
+      price: number;
+      userId: number | null;
+      snippet: string;
+      bookId: string;
+    },
+    thunkAPI
+  ) => {
     try {
-      const response = await axios.patch("/books/editbook", values)
+      const response = await axios.patch("/books/editbook", values);
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
@@ -195,13 +222,33 @@ export const editBook = createAsyncThunk(
 
 const initialState: InitialStateGetBooksI = {
   fav: [],
-  books: [],
+  data: { books: [], total: 0 },
   review: [],
-  filteredBooks: [],
+  singleBook: {
+    id: 0,
+    category: { value: "", id: 0 },
+    title: "",
+    author: "",
+    description: "",
+    price: 0,
+    creator: 0,
+    rating: 0,
+    image: "",
+  },
+  filter: {
+    author: "",
+    price: [],
+    rating: "",
+    category: "",
+    order: "",
+    page: 0,
+  },
   category: [],
   isFetching: false,
   isSuccess: false,
+  isSuccessRating : false,
   isError: false,
+  isSuccessBook:false,
   error: null,
 };
 
@@ -211,6 +258,9 @@ const booksSlice = createSlice({
   reducers: {
     addCurrentReview(state, action) {
       state.review && state.review.push(action.payload);
+    },
+    addFilterParams(state, action: PayloadAction<SearchI>) {
+      state.filter = { ...state.filter, ...action.payload };
     },
   },
   extraReducers: (builder) => {
@@ -232,8 +282,7 @@ const booksSlice = createSlice({
       state.isFetching = true;
     }),
       builder.addCase(getBooks.fulfilled, (state, action) => {
-        state.books = action.payload;
-        state.filteredBooks = action.payload;
+        state.data = action.payload;
         state.isFetching = false;
         state.isError = false;
         state.isSuccess = true;
@@ -241,6 +290,22 @@ const booksSlice = createSlice({
       builder.addCase(getBooks.rejected, (state, action) => {
         state.isFetching = false;
         state.isSuccess = false;
+        state.isError = true;
+        state.error = action.payload;
+      });
+    builder.addCase(getBook.pending, (state, action) => {
+      state.isFetching = true;
+      state.isSuccessBook = false
+    }),
+      builder.addCase(getBook.fulfilled, (state, action) => {
+        state.singleBook = action.payload;
+        state.isFetching = false;
+        state.isError = false;
+        state.isSuccessBook = true;
+      }),
+      builder.addCase(getBook.rejected, (state, action) => {
+        state.isFetching = false;
+        state.isSuccessBook = false;
         state.isError = true;
         state.error = action.payload;
       });
@@ -259,9 +324,24 @@ const booksSlice = createSlice({
         state.isError = true;
         state.error = action.payload;
       });
-    builder.addCase(getFavourites.pending, (state, action) => {
+    builder.addCase(addRating.pending, (state, action) => {
       state.isFetching = true;
+      state.isSuccessRating = false;
     }),
+      builder.addCase(addRating.fulfilled, (state, action) => {
+        state.isFetching = false;
+        state.isError = false;
+        state.isSuccessRating = true;
+      }),
+      builder.addCase(addRating.rejected, (state, action) => {
+        state.isFetching = false;
+        state.isSuccessRating = false;
+        state.isError = true;
+        state.error = action.payload;
+      }),
+      builder.addCase(getFavourites.pending, (state, action) => {
+        state.isFetching = true;
+      }),
       builder.addCase(getFavourites.fulfilled, (state, action) => {
         state.fav = action.payload;
         state.isFetching = false;
@@ -294,4 +374,4 @@ const booksSlice = createSlice({
 
 export default booksSlice.reducer;
 
-export const { addCurrentReview } = booksSlice.actions;
+export const { addCurrentReview, addFilterParams } = booksSlice.actions;

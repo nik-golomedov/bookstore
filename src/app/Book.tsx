@@ -2,10 +2,8 @@ import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
 import { useFormik } from "formik";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { useHistory, useParams } from "react-router-dom";
-import { makeStyles } from "@material-ui/core/styles";
-import Rating from "@material-ui/lab/Rating";
 import Time from "./Time";
-
+import "rc-rate/assets/index.css";
 import { useAppDispatch, useAppSelector } from "../common/hooks";
 import {
   addCurrentReview,
@@ -13,6 +11,7 @@ import {
   addRating,
   addReview,
   BookI,
+  getBook,
   getReview,
 } from "../features/bookSlice";
 import {
@@ -22,6 +21,7 @@ import {
   StyledReview,
 } from "../styledComponents/styled";
 import EditBook from "./EditBook";
+import Rate from "rc-rate";
 
 interface MatchParams {
   id: string;
@@ -35,20 +35,9 @@ export interface addReviewI {
   createAt: string;
 }
 
-const useStyles = makeStyles({
-  root: {
-    width: 200,
-    display: "flex",
-    alignItems: "center",
-  },
-});
-
 const BookPage: React.FC = () => {
   const isAuth = useAppSelector((state) => state.user?.user);
   const user = useAppSelector((state) => state.user?.user);
-  const [value, setValue] = React.useState<number | null>(2);
-  const [hover, setHover] = React.useState(-1);
-  const classes = useStyles();
   const [ratingValue, setRatingValue] = useState<string>("");
   const dispatch = useAppDispatch();
   const review = useAppSelector((state) => state.books.review);
@@ -56,10 +45,13 @@ const BookPage: React.FC = () => {
   const [editMode, setEditMode] = useState<boolean>(false);
   const [showRating, setShowRating] = useState<boolean>(false);
   const history = useHistory();
+  const isSuccessRating = useAppSelector(
+    (state) => state.books.isSuccessRating
+  );
   const userId: number | null = useAppSelector(
     (state) => state.user.user && state.user.user.id
   );
-
+  const book: BookI = useAppSelector((state) => state.books.singleBook);
   const formik = useFormik({
     initialValues: {
       text: "",
@@ -85,20 +77,28 @@ const BookPage: React.FC = () => {
     dispatch(getReview(id));
   }, []);
 
+  useEffect(() => {
+    if (ratingValue) {
+      dispatch(
+        addRating({
+          value: String(ratingValue),
+          userId: String(userId),
+          bookId: id,
+        })
+      );
+    }
+  }, [ratingValue]);
+
+  useEffect(() => {
+    dispatch(getBook(+id));
+  }, [ratingValue, isSuccessRating]);
+
   const handleAddFavourites = () => {
     dispatch(addFavourites({ userId: userId, bookId: +id }));
   };
 
-  const handleRatingChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    setRatingValue(() => e.target.value);
-  };
-
-  const handleRatingKeyUp = (e: React.KeyboardEvent, bookId: string): void => {
-    if (e.key === "Enter") {
-      dispatch(
-        addRating({ value: ratingValue, userId: String(userId), bookId })
-      );
-    }
+  const handleRatingChange = (value: string): void => {
+    setRatingValue(value);
   };
 
   const handleEditMode = () => {
@@ -112,27 +112,16 @@ const BookPage: React.FC = () => {
     setShowRating(!showRating ? true : false);
   };
 
-  const handleClick = (value: number | null, bookId: string): void => {
-    dispatch(
-      addRating({ value: String(hover), userId: String(userId), bookId })
-    );
-    handleShowRating();
-  };
-
-  const book: BookI[] = useAppSelector((state) =>
-    state.books.books.filter((item) => +id === item.id)
-  );
   return (
     <section>
       <div>
         {" "}
         {!editMode ? (
-          book &&
-          book.map((item: any) => (
-            <StyledFullSizeBookCard key={item.id}>
+          book && (
+            <StyledFullSizeBookCard key={book.id}>
               <div className="book-main">
                 <div className="book-image">
-                  <img src={item.image} alt={item.title} />
+                  <img src={book.image} alt={book.title} />
                 </div>
                 <div className="book-section">
                   {isAuth && (
@@ -144,42 +133,24 @@ const BookPage: React.FC = () => {
                     </div>
                   )}
                   <div>
-                    <h1>{item.title}</h1>
+                    <h1>{book.title}</h1>
                   </div>
-                  <div className="book-author">{item.author}</div>
-                  <div>{item.category.value}</div>
+                  <div className="book-author">{book.author}</div>
+                  <div>{book.category.value}</div>
                   <div className="book-rating">
                     <div>
-                      <AiFillStar /> {item.rating.toFixed(2)}
+                      <AiFillStar /> {book.rating && book.rating.toFixed(2)}
                     </div>
-                    {!showRating ? (
-                      <div onClick={handleShowRating}>
-                        <span className="book-add-rating">Оценить</span>
-                      </div>
-                    ) : (
-                      <div className={classes.root}>
-                        <Rating
-                          name="hover-feedback"
-                          value={item.rating}
-                          precision={1}
-                          onChange={(event, newValue) => {
-                            setValue(() => newValue);
-                          }}
-                          onChangeActive={(event, newHover) => {
-                            setHover(() => newHover);
-                          }}
-                          onClick={() => {
-                            handleClick(value, id);
-                          }}
-                        />
-                      </div>
-                    )}
+                    <Rate
+                      allowClear={false}
+                      onChange={(value) => handleRatingChange(String(value))}
+                    />
                     <div>Отзывов: {review.length} </div>
                   </div>
                   <div className="book-price">
-                    <div>{item.price} ₽</div>
+                    <div>{book.price} ₽</div>
                     <StyledButton>Купить</StyledButton>
-                    {userId === item.creator && (
+                    {userId === book.creator && (
                       <div>
                         <StyledButton onClick={handleEditMode}>
                           Редактировать
@@ -190,10 +161,10 @@ const BookPage: React.FC = () => {
                 </div>
               </div>
               <div className="book-snippet">
-                <b>Описание</b> <p>{item.description}</p>
+                <b>Описание</b> <p>{book.description}</p>
               </div>
             </StyledFullSizeBookCard>
-          ))
+          )
         ) : (
           <EditBook id={id} onChange={handleEditMode} book={book} />
         )}

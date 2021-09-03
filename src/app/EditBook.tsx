@@ -11,7 +11,7 @@ import {
 interface EditBookPropsI {
   id: string;
   onChange: () => void;
-  book: BookI[];
+  book: BookI;
 }
 
 const EditBook: React.FC<EditBookPropsI> = ({
@@ -23,9 +23,9 @@ const EditBook: React.FC<EditBookPropsI> = ({
 
   const initialValues: { description: string; price: number; snippet: string } =
     {
-      description: String(book.map((item) => item.description)),
-      price: Number(book.map((item) => item.price)),
-      snippet: String(book.map((item) => item.snippet)),
+      description: String(book.description),
+      price: Number(book.price),
+      snippet: String(book.snippet),
     };
 
   const userId: number | null = useAppSelector(
