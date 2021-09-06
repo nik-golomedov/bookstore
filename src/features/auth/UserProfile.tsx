@@ -1,9 +1,10 @@
 import React from "react";
 import { useEffect } from "react";
-import { Link, useHistory } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../common/hooks";
-import { getUserProfile } from "../features/userSlice";
-import { StyledButton, StyledUserProfile } from "../styledComponents/styled";
+import { useHistory } from "react-router-dom";
+
+import { useAppDispatch, useAppSelector } from "../../common/hooks";
+import { getUserProfile, isAuthSelector } from "./userSlice";
+import { StyledButton, StyledUserProfile } from "../../styledComponents/styled";
 
 interface UserI {
   fullName?: string;
@@ -12,10 +13,9 @@ interface UserI {
 }
 
 const UserProfile: React.FC = () => {
-
   const history = useHistory();
   const dispatch = useAppDispatch();
-  const userProfile: UserI | null = useAppSelector((state) => state.user.user);
+  const userProfile: UserI | null = useAppSelector(isAuthSelector);
 
   useEffect(() => {
     dispatch(getUserProfile());

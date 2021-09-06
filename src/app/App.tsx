@@ -1,23 +1,23 @@
-import "./App.css";
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 
 import Header from "./Header";
-import Login from "./Login";
-import SignUp from "./SignUp";
-import ProtectedRoute from "./ProtectedRoute";
-import SignRoute from "./SignRoute";
-import UserProfile from "./UserProfile";
-import { getUserProfile } from "../features/userSlice";
+import Login from "../features/auth/Login";
+import SignUp from "../features/auth/SignUp";
+import ProtectedRoute from "../common/ProtectedRoute";
+import SignRoute from "../common/SignRoute";
+import UserProfile from "../features/auth/UserProfile";
+import { getUserProfile } from "../features/auth/userSlice";
 import { useAppDispatch } from "../common/hooks";
-import MainPage from "./MainPage";
-import AddBook from "./AddBook";
-import BookPage from "./Book";
-import Favourites from "./Favourites";
+import MainPage from "../features/books/MainPage";
+import AddBook from "../features/books/AddBook";
+import BookPage from "../features/books/Book";
+import Favourites from "../features/books/Favourites";
 import SubHeader from "./SubHeader";
-import AddCategory from "./AddCategory";
+import AddCategory from "../features/books/AddCategory";
+import "./App.css";
 
-const App = () => {
+const App:React.FC = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -37,7 +37,8 @@ const App = () => {
           <ProtectedRoute path="/favourite" exact component={Favourites} />
           <ProtectedRoute path="/addcategory" exact component={AddCategory} />
           <Route path="/:id" exact component={BookPage} />
-          <Route path="/" exact component={MainPage}></Route>
+          <Route path="/" exact component={MainPage} />
+          <Redirect to="/"/>
         </Switch>
       </Router>
     </main>

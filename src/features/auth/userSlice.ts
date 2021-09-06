@@ -1,22 +1,30 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "../api/axios";
+import {
+  createSlice,
+  createAsyncThunk,
+  createDraftSafeSelector,
+} from "@reduxjs/toolkit";
+
+import axios from "../../api/axios";
+import { RootState } from "../store";
 
 export const getUserProfile = createAsyncThunk(
   "user/getUserProfile",
   async () => {
     try {
-      const response = await axios.get("/");
+      const response = await axios.get("/users/get-profile");
       return response.data;
     } catch (error) {
       console.log(error);
     }
   }
 );
+
 export interface UserI {
-  id:number
-  fullName:string
-  dob:string
+  id: number;
+  fullName: string;
+  dob: string;
 }
+
 interface UserProfileI {
   user: UserI | null;
   isLoading: boolean;
@@ -65,3 +73,14 @@ const userSlice = createSlice({
 export const { clearUser } = userSlice.actions;
 
 export default userSlice.reducer;
+
+const userState = (state: RootState) => state.user;
+
+export const userIdSelector = createDraftSafeSelector(
+  userState,
+  (state) => state.user && state.user.id
+);
+export const isAuthSelector = createDraftSafeSelector(
+  userState,
+  (state) => state && state.user
+);

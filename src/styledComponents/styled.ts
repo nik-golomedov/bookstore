@@ -258,10 +258,24 @@ export const StyledFullSizeBookCard = styled.div`
     font-size: 24px;
     font-weight: bold;
   }
+  .book-options {
+    display:flex;
+    & div {
+      cursor:pointer;
+      margin-top:30px;
+      padding:10px;
+      border:1px solid rgba(0,0,0,0.1)
+    }
+  }
 `;
-export const StyledButton = styled.button`
+
+interface StyledButtonI {
+ readonly widthSmall?:boolean
+}
+
+export const StyledButton = styled.button<StyledButtonI>`
   margin-top: 19px;
-  width: 280px;
+  width:${(props)=> (props.widthSmall ? "140px" : "280px")};
   border-radius: 3px;
   color: #ffffff;
   background-color: #26a9e0;
@@ -305,11 +319,22 @@ export const StyledAside = styled.aside`
   height: 800px;
   display: flex;
   flex-flow: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-start;
   margin: 20px 20px 0 10px;
   border-right: 1px solid rgba(0, 0, 0, 0.1);
+  .author-filter {
+    display:flex;
+    flex-flow:column;
+    margin: 10px 0;
+  }
+  .category-filter {
+    display:flex;
+    flex-flow:column;
+    margin-bottom:10px;
+  }
 `;
+
 export const StyledSection = styled.div`
   width: 100%;
   display: flex;
@@ -346,6 +371,7 @@ export const StyledReview = styled.div`
     margin-bottom: 30px;
   }
 `;
+
 export const StyledSubHeader = styled.div`
   display: flex;
   width: 100%;
@@ -390,6 +416,7 @@ export const StyledUserProfile = styled.section`
 interface StyledEditBookI {
   readonly display_none?: boolean;
 }
+
 export const StyledEditBook = styled.div<StyledEditBookI>`
   display: ${(props) => (props.display_none ? "none" : "absolute")}
   width:100%;

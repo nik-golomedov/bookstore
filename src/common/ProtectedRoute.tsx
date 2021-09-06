@@ -1,22 +1,20 @@
 import React from "react";
 import { Route, Redirect } from "react-router-dom";
-import { useAppSelector } from "../common/hooks";
+
+import { isAuthSelector } from "../features/auth/userSlice";
+import { useAppSelector } from "./hooks";
 
 const ProtectedRoute: React.FC<{
   component: React.FC;
   path: string;
   exact: boolean;
 }> = ({ component: Component, ...rest }: any) => {
-  const isAuth = useAppSelector((state) => state.user?.user);
+  const isAuth = useAppSelector(isAuthSelector);
   return (
     <Route
       {...rest}
       render={(props) =>
-        isAuth ? (
-          <Component {...props} {...rest} />
-        ) : (
-          <Redirect to="/login" />
-        )
+        isAuth ? <Component {...props} {...rest} /> : <Redirect to="/login" />
       }
     />
   );

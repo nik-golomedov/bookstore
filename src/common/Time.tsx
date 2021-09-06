@@ -1,9 +1,11 @@
 import { formatDistanceToNow, parseISO } from "date-fns";
 import React from "react";
+
 type TimePropsType = {
-    createTime:string
-}
-const Time = ({createTime}:TimePropsType) => {
+  createTime: string;
+};
+
+const Time: React.FC<TimePropsType> = ({ createTime }: TimePropsType) => {
   let timeAgo = "";
   if (createTime) {
     const date = parseISO(createTime);

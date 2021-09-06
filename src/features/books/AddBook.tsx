@@ -1,9 +1,20 @@
 import { useFormik } from "formik";
 import React, { useEffect } from "react";
+import * as Yup from "yup";
+//@ts-ignore
+import FlashMessage from "react-flash-message";
 
-import { useAppDispatch, useAppSelector } from "../common/hooks";
-import { addBook, CategoryI, getCategory } from "../features/bookSlice";
-import { StyledButton, StyledForm } from "../styledComponents/styled";
+import { useAppDispatch, useAppSelector } from "../../common/hooks";
+import {
+  addBook,
+  categorySelector,
+  clearAddBookRequest,
+  errorsAddBookSelector,
+  getCategory,
+  isSuccessAddedBookSelector,
+} from "./bookSlice";
+import { StyledButton, StyledForm } from "../../styledComponents/styled";
+import { userIdSelector } from "../auth/userSlice";
 
 export interface initialValuesAddBookI {
   title: string;
@@ -11,7 +22,7 @@ export interface initialValuesAddBookI {
   description: string;
   price: number;
   snippet?: string;
-  creator: number | null;
+  creatorId: number | null;
   rating: number;
   category: string;
   file?: File | null;
@@ -21,7 +32,7 @@ export interface initialValuesAddBookI {
 const initialValues: initialValuesAddBookI = {
   title: "",
   author: "",
-  creator: null,
+  creatorId: null,
   description: "",
   price: 100,
   rating: 0,
@@ -33,17 +44,21 @@ const initialValues: initialValuesAddBookI = {
 
 const AddBook: React.FC = () => {
   const dispatch = useAppDispatch();
-  const userId: number | null = useAppSelector(
-    (state) => state.user.user && state.user.user.id
-  );
-  const category = useAppSelector(
-    (state) => state.books && state.books.category
-  );
-  
+  const userId: number | null = useAppSelector(userIdSelector);
+  const category = useAppSelector(categorySelector);
+  const isSuccessAddedBook = useAppSelector(isSuccessAddedBookSelector);
+  const errorsAddBook = useAppSelector(errorsAddBookSelector);
   const formik = useFormik({
     initialValues,
+    validationSchema: Yup.object({
+      title: Yup.string().required("Required"),
+      description: Yup.string().required("Required"),
+      price: Yup.number().min(1).max(9999999).required("Required"),
+      category: Yup.number().required("Required"),
+      author: Yup.string().required("Required"),
+    }),
     onSubmit: (values: initialValuesAddBookI) => {
-      dispatch(addBook({ ...values, creator: userId }));
+      dispatch(addBook({ ...values, creatorId: userId }));
       formik.resetForm();
     },
   });
@@ -53,6 +68,10 @@ const AddBook: React.FC = () => {
   ): void => {
     formik.setFieldValue("file", (event.currentTarget.files as FileList)[0]);
   };
+
+  useEffect(() => {
+    setTimeout(() => dispatch(clearAddBookRequest()), 2000);
+  }, [isSuccessAddedBook]);
 
   useEffect(() => {
     dispatch(getCategory());
@@ -70,7 +89,9 @@ const AddBook: React.FC = () => {
           onBlur={formik.handleBlur}
           value={formik.values.title}
         />
-
+        {formik.touched.title && formik.errors.title ? (
+          <div>{formik.errors.title}</div>
+        ) : null}
         <label htmlFor="author">Автор</label>
         <input
           id="author"
@@ -80,7 +101,9 @@ const AddBook: React.FC = () => {
           onBlur={formik.handleBlur}
           value={formik.values.author}
         />
-
+        {formik.touched.author && formik.errors.author ? (
+          <div>{formik.errors.author}</div>
+        ) : null}
         <label htmlFor="description">Описание</label>
         <input
           id="description"
@@ -90,7 +113,9 @@ const AddBook: React.FC = () => {
           onBlur={formik.handleBlur}
           value={formik.values.description}
         />
-
+        {formik.touched.description && formik.errors.description ? (
+          <div>{formik.errors.description}</div>
+        ) : null}
         <label htmlFor="category">Категория</label>
         <select
           id="category"
@@ -107,7 +132,9 @@ const AddBook: React.FC = () => {
               </option>
             ))}
         </select>
-
+        {formik.touched.category && formik.errors.category ? (
+          <div>{formik.errors.category}</div>
+        ) : null}
         <label htmlFor="price">Цена</label>
         <input
           id="price"
@@ -119,7 +146,9 @@ const AddBook: React.FC = () => {
           onBlur={formik.handleBlur}
           value={formik.values.price}
         />
-
+        {formik.touched.price && formik.errors.price ? (
+          <div>{formik.errors.price}</div>
+        ) : null}
         <label htmlFor="snippet">Ознакомительный фрагмент</label>
         <input
           id="snippet"
@@ -141,7 +170,16 @@ const AddBook: React.FC = () => {
           <div>{formik.errors.file}</div>
         ) : null}
         <StyledButton type="submit">Добавить</StyledButton>
-        {status}
+        {isSuccessAddedBook && (
+          <FlashMessage duration={5000}>
+            <div> Книга успешно добавлена</div>
+          </FlashMessage>
+        )}
+        {errorsAddBook && (
+          <FlashMessage duration={3000}>
+            <div> errorsAddBook</div>
+          </FlashMessage>
+        )}
       </StyledForm>
     </div>
   );

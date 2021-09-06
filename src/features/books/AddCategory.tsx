@@ -1,14 +1,14 @@
 import { useFormik } from "formik";
 import React from "react"
-import { useAppDispatch } from "../common/hooks";
-import { addCategory } from "../features/bookSlice";
-import { StyledButton, StyledForm } from "../styledComponents/styled"
 
+import { useAppDispatch } from "../../common/hooks";
+import { addCategory } from "./bookSlice";
+import { StyledButton, StyledForm } from "../../styledComponents/styled"
 
 export interface AddCategoryI {
     category:string,
 }
-const AddCategory = () => {
+const AddCategory:React.FC = () => {
     const dispatch = useAppDispatch()
     const formik = useFormik({
         initialValues:{category:""},

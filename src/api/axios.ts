@@ -1,8 +1,8 @@
 import axios, { AxiosInstance } from "axios";
-import { clearUser } from "../features/userSlice";
+import { clearUser } from "../features/auth/userSlice";
 
 const axiosBase = axios.create({
-  baseURL: "http://localhost:8000/users",
+  baseURL: "http://localhost:8000",
 });
 
 axiosBase.interceptors.request.use(
@@ -16,15 +16,17 @@ axiosBase.interceptors.request.use(
   }
 );
 
-export const initResponseInt = (store:any) => {
+export const initResponseInt = (store: any) => {
   axiosBase.interceptors.response.use(
     function (response) {
       return response;
     },
     function (error) {
-      store.dispatch(clearUser());
-      localStorage.removeItem("isAuth");
-      return Promise.reject(error);
+      if (error.response.status === 401) {
+        store.dispatch(clearUser());
+        localStorage.removeItem("isAuth");
+        return Promise.reject(error);
+      }
     }
   );
 };

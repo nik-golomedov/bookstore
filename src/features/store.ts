@@ -1,18 +1,10 @@
-import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 
-import signUpReducer from "./signupSlice";
-import loginReducer from "./loginSlice";
-import userReducer from "./userSlice";
-import booksReducer from "./bookSlice";
+import signUpReducer from "./auth/signupSlice";
+import loginReducer from "./auth/loginSlice";
+import userReducer from "./auth/userSlice";
+import booksReducer from "./books/bookSlice";
 import { initResponseInt } from "../api/axios";
-
-const reducers = combineReducers({
-  signUp: signUpReducer,
-  login: loginReducer,
-  user: userReducer,
-  books: booksReducer,
-});
-
 
 const store = configureStore({
   reducer: {
@@ -23,11 +15,11 @@ const store = configureStore({
   },
 });
 
-initResponseInt(store)
+initResponseInt(store);
 
 export default store;
 
-export type StoreType = typeof store 
+export type StoreType = typeof store;
 
 export type RootState = ReturnType<typeof store.getState>;
 

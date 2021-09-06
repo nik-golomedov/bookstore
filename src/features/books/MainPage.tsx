@@ -11,19 +11,26 @@ import Url from "urls-tool";
 import "rc-slider/assets/index.css";
 import "rc-rate/assets/index.css";
 
-import { useAppDispatch, useAppSelector } from "../common/hooks";
+import { useAppDispatch, useAppSelector } from "../../common/hooks";
 import {
   addFilterParams,
   BookI,
+  bookSelector,
+  categorySelector,
+  filterSelector,
   getBooks,
   getCategory,
-} from "../features/bookSlice";
+  isFetchingBooksSelector,
+  totalSelector,
+} from "./bookSlice";
 import {
   StyledAside,
   StyledBookCard,
+  StyledButton,
   StyledMainPage,
   StyledSection,
-} from "../styledComponents/styled";
+} from "../../styledComponents/styled";
+import Spinner from "../../common/Spinner";
 
 export interface BooksI extends BookI {
   image: string;
@@ -40,77 +47,116 @@ export interface SearchI {
 
 const MainPage: React.FC = () => {
   const dispatch = useAppDispatch();
-  const books: BooksI[] = useAppSelector((state) => state.books.data.books);
-  const filterSearch = useAppSelector((state) => state.books.filter);
-  const total = useAppSelector((state) => state.books.data.total);
-  const [count,setCount] = useState<number>(0)
-  const category = useAppSelector(
-    (state) => state.books && state.books.category
-  );
-  const { params  }  = Url;
-  const [page, setPage] =useState<number>(0)
+  const books: BooksI[] = useAppSelector(bookSelector);
+  const [rangeValue, setRangeValue] = useState<number[]>([]);
+  const filterSearch = useAppSelector(filterSelector);
+  const total = useAppSelector(totalSelector);
+  const [count, setCount] = useState<number>(0);
+  const category = useAppSelector(categorySelector);
+  const isFetchiingBooks = useAppSelector(isFetchingBooksSelector);
+  const { params } = Url;
+  const [page, setPage] = useState<number>(0);
+  const pageCount = total && Math.ceil(total / 8);
+
   const checkFilterSearch = (filterSearch: SearchI) => {
     const newFilterSearch: SearchI = {};
     if (filterSearch.author) newFilterSearch.author = filterSearch.author;
-    if (filterSearch.rating && +filterSearch.rating!==0) newFilterSearch.rating = filterSearch.rating;
+    if (filterSearch.rating && +filterSearch.rating !== 0)
+      newFilterSearch.rating = filterSearch.rating;
     if (filterSearch.price && filterSearch.price.length !== 0) {
       newFilterSearch.price = filterSearch.price;
     }
     if (filterSearch.category) newFilterSearch.category = filterSearch.category;
     if (filterSearch.order) newFilterSearch.order = filterSearch.order;
-    if (filterSearch.page)
-      newFilterSearch.page = filterSearch.page;
     return newFilterSearch;
   };
+
   useEffect(() => {
     dispatch(getCategory());
   }, []);
 
   useEffect(() => {
+    setPage(params.page === undefined ? 0 : params.page);
     const newFilterSearch = checkFilterSearch(filterSearch);
     dispatch(getBooks({ newFilterSearch }));
     Url.params = { ...newFilterSearch };
-  }, [count,page]);
+  }, [count]);
 
   useEffect(() => {
-    const newFilterSearch = checkFilterSearch(params);
+    let newFilterSearch = checkFilterSearch(filterSearch);
+    newFilterSearch = { ...newFilterSearch, page };
     dispatch(getBooks({ newFilterSearch }));
-  }, []);
+    if (page === 0) {
+      Url.params = {};
+    } else {
+      Url.params = { ...newFilterSearch };
+    }
+  }, [page]);
 
-  const pageCount = total && Math.ceil(total / 8);
+  useEffect(() => {
+    setPage(params.page === undefined ? 0 : params.page);
+    let newFilterSearch = checkFilterSearch(params);
+    newFilterSearch = { ...newFilterSearch, page: params.page };
+    dispatch(getBooks({ newFilterSearch }));
+    Url.params = params;
+  }, []);
 
   const initialValues: SearchI = {
     author: "",
     category: "",
   };
+
   const formik = useFormik({
     initialValues,
     onSubmit: (values: SearchI) => {
       dispatch(addFilterParams(values));
-      setCount((c)=>c+1)
-      formik.resetForm();
+      setCount((c) => c + 1);
     },
   });
+
   const handlePageClick = ({
     selected: selectedPage,
   }: {
     selected: number;
   }) => {
-    setPage(selectedPage)
-    dispatch(addFilterParams({ page: selectedPage }));
+    setPage(selectedPage);
   };
-
 
   const handleRatingChange = (value: number) => {
     dispatch(addFilterParams({ rating: String(value) }));
   };
 
+  const handleRangeChange = (value: number[]): void => {
+    setRangeValue(value);
+  };
+
+  useEffect(() => {
+    dispatch(addFilterParams({ price: rangeValue }));
+  }, [rangeValue]);
+
+  const clearFilter = () => {
+    dispatch(
+      addFilterParams({
+        author: "",
+        price: [],
+        rating: "",
+        category: "",
+        order: "",
+        page: 0,
+      })
+    );
+    formik.resetForm()
+    Url.params = {};
+    setCount((c) => c + 1);
+  };
+
   return (
     <StyledMainPage>
       <StyledAside>
+        Фильтрация
         <form onSubmit={formik.handleSubmit}>
-          <div>
-            <label htmlFor="category">Категории</label>
+          <div className="category-filter">
+            <label htmlFor="category">По категории</label>
             <select
               id="category"
               name="category"
@@ -126,32 +172,44 @@ const MainPage: React.FC = () => {
                 ))}
             </select>
           </div>
-
-          <Range
-            min={1}
-            onChange={(value) => dispatch(addFilterParams({ price: value }))}
-            max={10000}
-            defaultValue={[100, 1000]}
-            count={100}
-          />
-
-          <label htmlFor="author">По автору</label>
-          <input
-            id="author"
-            name="author"
-            type="text"
-            value={formik.values.author}
-            onChange={formik.handleChange}
-          />
-
-          <Rate
-            defaultValue={4}
-            allowClear={true}
-            onChange={(value) => handleRatingChange(value)}
-          />
-          <button type="submit">Поиск</button>
+          По цене
+          <div>
+            min: {rangeValue[0]} max: {rangeValue[1]}
+            <Range
+              min={1}
+              value={rangeValue}
+              onChange={(value) => handleRangeChange(value)}
+              max={999999}
+              count={100}
+            />
+          </div>
+          <div className="author-filter">
+            <label htmlFor="author">По автору</label>
+            <input
+              id="author"
+              name="author"
+              type="text"
+              value={formik.values.author}
+              onChange={formik.handleChange}
+            />
+          </div>
+          По рейтингу
+          <div>
+            <Rate
+              defaultValue={0}
+              allowClear={true}
+              onChange={(value) => handleRatingChange(value)}
+            />
+          </div>
+          <div>
+            <StyledButton widthSmall type="submit">
+              Поиск
+            </StyledButton>
+            <StyledButton widthSmall type="submit" onClick={clearFilter}>
+              Сброс
+            </StyledButton>
+          </div>
         </form>
-       
       </StyledAside>
 
       <StyledSection>
@@ -174,29 +232,31 @@ const MainPage: React.FC = () => {
             <option value={"rating_DESC"}>по рейтингу (по убыванию)</option>
           </select>
           {total ? (
-          <ReactPaginate
-            previousLabel={"<<"}
-            nextLabel={">>"}
-            pageCount={pageCount}
-            onPageChange={handlePageClick}
-            pageRangeDisplayed={2}
-            marginPagesDisplayed={2}
-            containerClassName="paginateContainer"
-            pageClassName="page"
-            pageLinkClassName="pageLink"
-            activeClassName="activePage"
-            activeLinkClassName="activeLink"
-          />
-        ) : null}
+            <ReactPaginate
+              previousLabel={"<"}
+              nextLabel={">"}
+              pageCount={pageCount}
+              onPageChange={handlePageClick}
+              pageRangeDisplayed={2}
+              marginPagesDisplayed={2}
+              disableInitialCallback={false}
+              forcePage={+page}
+              containerClassName="paginateContainer"
+              pageClassName="page"
+              pageLinkClassName="pageLink"
+              activeClassName="activePage"
+              activeLinkClassName="activeLink"
+            />
+          ) : null}
         </div>
-
+        <>{isFetchiingBooks && <Spinner />}</>
         <div className="book-container">
           {books &&
             books.map((item) => (
               <StyledBookCard key={item.id}>
                 <div className="image-container">
                   <Link to={`/${item.id}`}>
-                    <img src={item.image} alt={item.title} />
+                    <img src={item.image && item.image} alt={item.title} />
                   </Link>
                 </div>
 

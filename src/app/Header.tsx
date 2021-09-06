@@ -1,9 +1,10 @@
 import React from "react";
-import { AiOutlineSearch, AiOutlineStar } from "react-icons/ai";
+import { AiOutlineSearch } from "react-icons/ai";
 import { GrLogin, GrLogout } from "react-icons/gr";
 import { Link, useHistory } from "react-router-dom";
+
 import { useAppDispatch, useAppSelector } from "../common/hooks";
-import { clearUser } from "../features/userSlice";
+import { clearUser } from "../features/auth/userSlice";
 import { StyledHeader, StyledListItem } from "../styledComponents/styled";
 
 const Header: React.FC = () => {

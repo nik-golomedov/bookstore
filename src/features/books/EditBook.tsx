@@ -1,13 +1,15 @@
 import { useFormik } from "formik";
 import React from "react";
 
-import { useAppDispatch, useAppSelector } from "../common/hooks";
-import { BookI, editBook } from "../features/bookSlice";
+import { useAppDispatch, useAppSelector } from "../../common/hooks";
+import { BookI, editBook } from "./bookSlice";
 import {
   StyledButton,
   StyledEditBook,
   StyledForm,
-} from "../styledComponents/styled";
+} from "../../styledComponents/styled";
+import { userIdSelector } from "../auth/userSlice";
+
 interface EditBookPropsI {
   id: string;
   onChange: () => void;
@@ -28,9 +30,7 @@ const EditBook: React.FC<EditBookPropsI> = ({
       snippet: String(book.snippet),
     };
 
-  const userId: number | null = useAppSelector(
-    (state) => state.user.user && state.user.user.id
-  );
+  const userId: number | null = useAppSelector(userIdSelector);
 
   const formik = useFormik({
     initialValues,

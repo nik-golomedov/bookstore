@@ -2,11 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { Link, useHistory } from "react-router-dom";
 import { IconContext } from "react-icons/lib";
-import { StyledForm } from "../styledComponents/styled";
-import { useAppDispatch, useAppSelector } from "../common/hooks";
-import { dropStateRequest, loginUser } from "../features/loginSlice";
+import * as Yup from "yup";
+
+import { StyledForm } from "../../styledComponents/styled";
+import { useAppDispatch, useAppSelector } from "../../common/hooks";
+import {
+  dropStateRequest,
+  errorLoginSelector,
+  loginSuccessSelector,
+  loginUser,
+} from "./loginSlice";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import { getUserProfile } from "../features/userSlice";
+import { getUserProfile } from "./userSlice";
+import ToggleEye from "../../common/ToggleEye";
 
 export interface LoginFormValuesI {
   email: string;
@@ -16,8 +24,8 @@ export interface LoginFormValuesI {
 const Login: React.FC = () => {
   const history = useHistory();
   const dispatch = useAppDispatch();
-  const loginSuccess = useAppSelector((state) => state.login.isSuccess);
-  const errorLogin = useAppSelector((state) => state.login.error);
+  const loginSuccess = useAppSelector(loginSuccessSelector);
+  const errorLogin = useAppSelector(errorLoginSelector);
   const initialValues: LoginFormValuesI = { email: "", password: "" };
   const [toggleEye, setToggleEye] = useState<boolean>(false);
 
@@ -35,6 +43,12 @@ const Login: React.FC = () => {
 
   const formik = useFormik({
     initialValues,
+    validationSchema: Yup.object({
+      email: Yup.string().email("Invalid email address").required("Required"),
+      password: Yup.string()
+        .min(6, "Must be 6 characters or more")
+        .required("Required"),
+    }),
     onSubmit: (values: LoginFormValuesI) => {
       dispatch(loginUser(values));
       formik.resetForm();
@@ -68,11 +82,7 @@ const Login: React.FC = () => {
           onBlur={formik.handleBlur}
           value={formik.values.password}
         />{" "}
-        {!toggleEye ? (
-          <AiFillEye onClick={togglePass} />
-        ) : (
-          <AiFillEyeInvisible onClick={togglePass} />
-        )}
+        <ToggleEye toggleEye={toggleEye} handleClick={togglePass} />
         {formik.touched.password && formik.errors.password ? (
           <div>{formik.errors.password}</div>
         ) : null}

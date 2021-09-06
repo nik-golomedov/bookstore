@@ -1,30 +1,30 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, createDraftSafeSelector } from "@reduxjs/toolkit";
 
-import { LoginFormValuesI } from "../app/Login";
-import axios from "../api/axios";
+import { LoginFormValuesI } from "./Login";
+import axios from "../../api/axios";
 import { initialStateSignI } from "./signupSlice";
+import { RootState } from "../store";
 
 export const loginUser = createAsyncThunk(
   "login/loginUser",
-  async (formValues: LoginFormValuesI,thunkAPI) => {
+  async (formValues: LoginFormValuesI, thunkAPI) => {
     try {
-      const response = await axios.post("/login", formValues);
+      const response = await axios.post("users/login", formValues);
       return response.data;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data)
+      return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
 
-interface initialStateSignInI extends initialStateSignI {
-}
+interface initialStateSignInI extends initialStateSignI {}
 
 const initialState: initialStateSignInI = {
   status: "",
   isFetching: false,
   isSuccess: false,
   isError: false,
-  error: null
+  error: null,
 };
 
 const loginSlice = createSlice({
@@ -35,7 +35,7 @@ const loginSlice = createSlice({
       state.isFetching = false;
       state.isSuccess = false;
       state.isError = false;
-      state.error=null
+      state.error = null;
       state.status = "";
     },
   },
@@ -43,15 +43,15 @@ const loginSlice = createSlice({
     builder.addCase(loginUser.pending, (state, action) => {
       state.isFetching = true;
       state.isError = false;
-      state.isSuccess = false
+      state.isSuccess = false;
       state.status = "";
     }),
       builder.addCase(loginUser.fulfilled, (state, action) => {
         state.isFetching = false;
         state.isError = false;
-        
+
         if (action.payload.token) {
-          localStorage.setItem("isAuth", action.payload.token);   
+          localStorage.setItem("isAuth", action.payload.token);
           state.isSuccess = true;
           state.status = "Success";
         } else {
@@ -67,6 +67,11 @@ const loginSlice = createSlice({
   },
 });
 
-export const {dropStateRequest} = loginSlice.actions
+export const { dropStateRequest } = loginSlice.actions;
 
 export default loginSlice.reducer;
+
+const loginState = (state: RootState) => state.login;
+ 
+export const loginSuccessSelector = createDraftSafeSelector(loginState,(state) => state.isSuccess);
+export const errorLoginSelector = createDraftSafeSelector(loginState,(state) => state.error);

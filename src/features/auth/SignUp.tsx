@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { IconContext } from "react-icons";
 import { Link, useHistory } from "react-router-dom";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import { StyledForm } from "../styledComponents/styled";
-import { useAppDispatch, useAppSelector } from "../common/hooks";
-import { dropStatus, signUpUser } from "../features/signupSlice";
-import { useEffect } from "react";
-import { IconContext } from "react-icons";
+
+import { useAppDispatch, useAppSelector } from "../../common/hooks";
+import { clearStatus, signUpUser, statusSelector } from "./signupSlice";
+import { StyledForm } from "../../styledComponents/styled";
+import ToggleEye from "../../common/ToggleEye";
+
 export interface FormValuesI {
   fullName: string;
   email: string;
@@ -22,20 +24,22 @@ const initialValues: FormValuesI = {
   dob: "",
 };
 
-const SignUp = () => {
+const SignUp: React.FC = () => {
   const dispatch = useAppDispatch();
   const history = useHistory();
-  const status = useAppSelector((state) => state.signUp.status);
+  const status = useAppSelector(statusSelector);
+  console.log(status)
   const [toggleEye, setToggleEye] = useState<boolean>(false);
   const togglePass = (): void => {
     setToggleEye(!toggleEye ? true : false);
   };
+
   useEffect(() => {
     if (status === "Registration success") {
       history.push("/login");
-      setTimeout(() => dispatch(dropStatus()), 1000);
+      setTimeout(() => dispatch(clearStatus()), 1000);
     } else {
-      setTimeout(() => dispatch(dropStatus()), 3000)
+      setTimeout(() => dispatch(clearStatus()), 3000);
     }
   }, [status]);
 
@@ -58,7 +62,9 @@ const SignUp = () => {
   });
   return (
     <StyledForm onSubmit={formik.handleSubmit}>
-      <IconContext.Provider value={{ className:"react-icon__eye", size: "20px" }}>
+      <IconContext.Provider
+        value={{ className: "react-icon__eye", size: "20px" }}
+      >
         <label htmlFor="fullName">Full Name</label>
         <input
           id="fullName"
@@ -94,7 +100,7 @@ const SignUp = () => {
           onBlur={formik.handleBlur}
           value={formik.values.password}
         />
-          {!toggleEye ? <AiFillEye onClick={togglePass} /> : <AiFillEyeInvisible onClick={togglePass} />}
+        <ToggleEye toggleEye={toggleEye} handleClick={togglePass} />
         {formik.touched.password && formik.errors.password ? (
           <div>{formik.errors.password}</div>
         ) : null}
