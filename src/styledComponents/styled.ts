@@ -61,7 +61,9 @@ export const StyledListItem = styled.li`
 `;
 interface StyledFormPropsI {
   readonly ai_fs?: boolean;
+  smallWidth?: boolean;
 }
+
 export const StyledForm = styled.form<StyledFormPropsI>`
   display: flex;
   flex-flow:column;
@@ -70,9 +72,9 @@ export const StyledForm = styled.form<StyledFormPropsI>`
   width:70%;
   margin:0 auto;
   & textarea {
-    border:none;
     resize:none;
-    width:100%;
+    padding:8px;
+    width:${(props) => (props.smallWidth ? "300px" : "100%")};
     height:120px;
   }
   & > * {
@@ -259,23 +261,23 @@ export const StyledFullSizeBookCard = styled.div`
     font-weight: bold;
   }
   .book-options {
-    display:flex;
+    display: flex;
     & div {
-      cursor:pointer;
-      margin-top:30px;
-      padding:10px;
-      border:1px solid rgba(0,0,0,0.1)
+      cursor: pointer;
+      margin-top: 30px;
+      padding: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
     }
   }
 `;
 
 interface StyledButtonI {
- readonly widthSmall?:boolean
+  readonly widthSmall?: boolean;
 }
 
 export const StyledButton = styled.button<StyledButtonI>`
   margin-top: 19px;
-  width:${(props)=> (props.widthSmall ? "140px" : "280px")};
+  width: ${(props) => (props.widthSmall ? "140px" : "280px")};
   border-radius: 3px;
   color: #ffffff;
   background-color: #26a9e0;
@@ -299,7 +301,6 @@ export const StyledMainPage = styled.section`
   }
   .pageLink:hover {
     box-shadow: inset 0 0 3px #26a9e0;
-
   }
   .page {
     margin: 0 5px;
@@ -309,9 +310,9 @@ export const StyledMainPage = styled.section`
 
   .activeLink {
     background-color: #26a9e0;
-    border-radius:4px;
-    transition:.2s ease-in;
-    color:white;
+    border-radius: 4px;
+    transition: 0.2s ease-in;
+    color: white;
   }
 `;
 export const StyledAside = styled.aside`
@@ -324,14 +325,14 @@ export const StyledAside = styled.aside`
   margin: 20px 20px 0 10px;
   border-right: 1px solid rgba(0, 0, 0, 0.1);
   .author-filter {
-    display:flex;
-    flex-flow:column;
+    display: flex;
+    flex-flow: column;
     margin: 10px 0;
   }
   .category-filter {
-    display:flex;
-    flex-flow:column;
-    margin-bottom:10px;
+    display: flex;
+    flex-flow: column;
+    margin-bottom: 10px;
   }
 `;
 

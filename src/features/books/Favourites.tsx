@@ -1,9 +1,9 @@
 import React from "react";
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+
 import { useAppDispatch, useAppSelector } from "../../common/hooks";
 import { favListSelector, getFavourites } from "./bookSlice";
-import { StyledBookCard, StyledSection } from "../../styledComponents/styled";
+import { StyledSection } from "../../styledComponents/styled";
 import BookCard from "../../common/BookCard";
 
 const Favourites: React.FC = () => {
@@ -20,13 +20,13 @@ const Favourites: React.FC = () => {
         {favList &&
           favList.map((item) => (
             <BookCard
-            id={item.id}
-            image={item.image}
-            title={item.title}
-            price={item.price}
-            author={item.author}
-            key={item.id}
-          />
+              id={item.id}
+              image={item.image}
+              title={item.title}
+              price={item.price}
+              author={item.author}
+              key={item.id}
+            />
           ))}{" "}
       </div>
     </StyledSection>

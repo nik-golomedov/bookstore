@@ -27,7 +27,6 @@ const SignUp: React.FC = () => {
   const dispatch = useAppDispatch();
   const history = useHistory();
   const status = useAppSelector(statusSelector);
-  console.log(status)
   const [toggleEye, setToggleEye] = useState<boolean>(false);
   const togglePass = (): void => {
     setToggleEye(!toggleEye ? true : false);

@@ -48,7 +48,7 @@ export interface SearchI {
 const MainPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const books: BooksI[] = useAppSelector(bookSelector);
-  const [rangeValue, setRangeValue] = useState<number[]>([]);
+  const [rangeValue, setRangeValue] = useState<number[]>([1, 100000]);
   const filterSearch = useAppSelector(filterSelector);
   const total = useAppSelector(totalSelector);
   const [count, setCount] = useState<boolean>(false);
@@ -115,11 +115,10 @@ const MainPage: React.FC = () => {
     setCount(!count ? true : false);
   };
 
-
   useEffect(() => {
     dispatch(getCategory());
   }, []);
-  
+
   useEffect(() => {
     setPage(params.page === undefined ? 0 : params.page);
     const newFilterSearch = checkFilterSearch(filterSearch);
@@ -128,7 +127,7 @@ const MainPage: React.FC = () => {
   }, [count]);
 
   useEffect(() => {
-    let newFilterSearch = checkFilterSearch(filterSearch);
+    let newFilterSearch = checkFilterSearch(params);
     newFilterSearch = { ...newFilterSearch, page };
     dispatch(getBooks({ newFilterSearch }));
     if (page === 0) {
@@ -146,11 +145,10 @@ const MainPage: React.FC = () => {
     dispatch(getBooks({ newFilterSearch }));
     Url.params = params;
   }, []);
-  
+
   useEffect(() => {
     dispatch(addFilterParams({ price: rangeValue }));
   }, [rangeValue]);
-
 
   return (
     <StyledMainPage>
@@ -221,6 +219,7 @@ const MainPage: React.FC = () => {
             id="order"
             name="order"
             value={formik.values.order}
+            defaultValue=""
             onChange={formik.handleChange}
           >
             <option value="" disabled>

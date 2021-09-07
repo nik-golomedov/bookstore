@@ -84,6 +84,7 @@ const BookPage: React.FC = () => {
           createdAt: new Date().toISOString(),
         })
       );
+      setShowReview(true);
       formik.resetForm();
     },
   });
@@ -233,7 +234,9 @@ const BookPage: React.FC = () => {
               {showReview ? (
                 Array.isArray(review) && <Review review={review} />
               ) : (
-                <>{book.snippet}</>
+                <>
+                  <p>{book.snippet}</p>
+                </>
               )}
             </>
           )

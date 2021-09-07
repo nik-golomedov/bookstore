@@ -54,10 +54,9 @@ const EditBook: React.FC<EditBookPropsI> = ({
       <StyledEditBook>
         <StyledForm onSubmit={formik.handleSubmit}>
           <label htmlFor="description">Описание</label>
-          <input
+          <textarea
             id="description"
             name="description"
-            type="text"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.description}
@@ -80,10 +79,9 @@ const EditBook: React.FC<EditBookPropsI> = ({
             <div>{formik.errors.price}</div>
           ) : null}
           <label htmlFor="snippet">Ознакомительный фрагмент</label>
-          <input
+          <textarea
             id="snippet"
             name="snippet"
-            type="text"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.snippet}

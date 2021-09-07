@@ -1,6 +1,7 @@
 import React from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { GrLogin, GrLogout } from "react-icons/gr";
+import { IconContext } from "react-icons/lib";
 import { Link, useHistory } from "react-router-dom";
 
 import { useAppDispatch, useAppSelector } from "../common/hooks";
@@ -11,13 +12,12 @@ const Header: React.FC = () => {
   const isAuth = useAppSelector((state) => state.user?.user);
   const dispatch = useAppDispatch();
   const history = useHistory();
-
   const handleClick = (): void => {
     localStorage.removeItem("isAuth");
     dispatch(clearUser());
     history.push("/login");
   };
-  
+
   return (
     <StyledHeader>
       <div className="header-logo">Bookstore</div>

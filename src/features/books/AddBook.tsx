@@ -105,10 +105,9 @@ const AddBook: React.FC = () => {
           <div>{formik.errors.author}</div>
         ) : null}
         <label htmlFor="description">Описание</label>
-        <input
+        <textarea
           id="description"
           name="description"
-          type="text"
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           value={formik.values.description}
@@ -150,10 +149,9 @@ const AddBook: React.FC = () => {
           <div>{formik.errors.price}</div>
         ) : null}
         <label htmlFor="snippet">Ознакомительный фрагмент</label>
-        <input
+        <textarea
           id="snippet"
           name="snippet"
-          type="text"
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           value={formik.values.snippet}
