@@ -52,7 +52,7 @@ const EditBook: React.FC<EditBookPropsI> = ({
   return (
     <>
       <StyledEditBook>
-        <StyledForm onSubmit={formik.handleSubmit}>
+        <StyledForm smallWidth onSubmit={formik.handleSubmit}>
           <label htmlFor="description">Описание</label>
           <textarea
             id="description"

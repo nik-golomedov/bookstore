@@ -79,7 +79,7 @@ const AddBook: React.FC = () => {
 
   return (
     <div>
-      <StyledForm onSubmit={formik.handleSubmit}>
+      <StyledForm smallWidth onSubmit={formik.handleSubmit}>
         <label htmlFor="title">Название</label>
         <input
           id="title"
