@@ -80,6 +80,7 @@ export const userIdSelector = createDraftSafeSelector(
   userState,
   (state) => state.user && state.user.id
 );
+
 export const isAuthSelector = createDraftSafeSelector(
   userState,
   (state) => state && state.user

@@ -1,5 +1,10 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
 
 import Header from "./Header";
 import Login from "../features/auth/Login";
@@ -17,7 +22,7 @@ import SubHeader from "./SubHeader";
 import AddCategory from "../features/books/AddCategory";
 import "./App.css";
 
-const App:React.FC = () => {
+const App: React.FC = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -28,7 +33,7 @@ const App:React.FC = () => {
     <main className="App">
       <Router>
         <Header></Header>
-       <SubHeader />
+        <SubHeader />
         <Switch>
           <SignRoute path="/signup" exact component={SignUp} />
           <SignRoute path="/login" exact component={Login} />
@@ -37,8 +42,7 @@ const App:React.FC = () => {
           <ProtectedRoute path="/favourite" exact component={Favourites} />
           <ProtectedRoute path="/addcategory" exact component={AddCategory} />
           <Route path="/:id" exact component={BookPage} />
-          <Route path="/" exact component={MainPage} />
-          <Redirect to="/"/>
+          <Route path="/" component={MainPage} />
         </Switch>
       </Router>
     </main>

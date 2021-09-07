@@ -8,6 +8,7 @@ import { StyledButton, StyledForm } from "../../styledComponents/styled"
 export interface AddCategoryI {
     category:string,
 }
+
 const AddCategory:React.FC = () => {
     const dispatch = useAppDispatch()
     const formik = useFormik({

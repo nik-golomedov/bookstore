@@ -3,7 +3,6 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { IconContext } from "react-icons";
 import { Link, useHistory } from "react-router-dom";
-import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
 import { useAppDispatch, useAppSelector } from "../../common/hooks";
 import { clearStatus, signUpUser, statusSelector } from "./signupSlice";
@@ -34,15 +33,6 @@ const SignUp: React.FC = () => {
     setToggleEye(!toggleEye ? true : false);
   };
 
-  useEffect(() => {
-    if (status === "Registration success") {
-      history.push("/login");
-      setTimeout(() => dispatch(clearStatus()), 1000);
-    } else {
-      setTimeout(() => dispatch(clearStatus()), 3000);
-    }
-  }, [status]);
-
   const formik = useFormik({
     initialValues,
     validationSchema: Yup.object({
@@ -60,6 +50,18 @@ const SignUp: React.FC = () => {
       formik.resetForm();
     },
   });
+  const clearStatusDelay = (ms:number) => {
+    setTimeout(() => dispatch(clearStatus()), ms);
+  }
+  useEffect(() => {
+    if (status === "Registration success") {
+      history.push("/login");
+      clearStatusDelay(1000)
+    } else {
+      clearStatusDelay(3000)
+    }
+  }, [status]);
+
   return (
     <StyledForm onSubmit={formik.handleSubmit}>
       <IconContext.Provider

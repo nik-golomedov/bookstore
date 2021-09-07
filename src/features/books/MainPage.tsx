@@ -25,12 +25,12 @@ import {
 } from "./bookSlice";
 import {
   StyledAside,
-  StyledBookCard,
   StyledButton,
   StyledMainPage,
   StyledSection,
 } from "../../styledComponents/styled";
 import Spinner from "../../common/Spinner";
+import BookCard from "../../common/BookCard";
 
 export interface BooksI extends BookI {
   image: string;
@@ -51,12 +51,16 @@ const MainPage: React.FC = () => {
   const [rangeValue, setRangeValue] = useState<number[]>([]);
   const filterSearch = useAppSelector(filterSelector);
   const total = useAppSelector(totalSelector);
-  const [count, setCount] = useState<number>(0);
+  const [count, setCount] = useState<boolean>(false);
   const category = useAppSelector(categorySelector);
   const isFetchiingBooks = useAppSelector(isFetchingBooksSelector);
   const { params } = Url;
   const [page, setPage] = useState<number>(0);
   const pageCount = total && Math.ceil(total / 8);
+  const initialValues: SearchI = {
+    author: "",
+    category: "",
+  };
 
   const checkFilterSearch = (filterSearch: SearchI) => {
     const newFilterSearch: SearchI = {};
@@ -71,46 +75,11 @@ const MainPage: React.FC = () => {
     return newFilterSearch;
   };
 
-  useEffect(() => {
-    dispatch(getCategory());
-  }, []);
-
-  useEffect(() => {
-    setPage(params.page === undefined ? 0 : params.page);
-    const newFilterSearch = checkFilterSearch(filterSearch);
-    dispatch(getBooks({ newFilterSearch }));
-    Url.params = { ...newFilterSearch };
-  }, [count]);
-
-  useEffect(() => {
-    let newFilterSearch = checkFilterSearch(filterSearch);
-    newFilterSearch = { ...newFilterSearch, page };
-    dispatch(getBooks({ newFilterSearch }));
-    if (page === 0) {
-      Url.params = {};
-    } else {
-      Url.params = { ...newFilterSearch };
-    }
-  }, [page]);
-
-  useEffect(() => {
-    setPage(params.page === undefined ? 0 : params.page);
-    let newFilterSearch = checkFilterSearch(params);
-    newFilterSearch = { ...newFilterSearch, page: params.page };
-    dispatch(getBooks({ newFilterSearch }));
-    Url.params = params;
-  }, []);
-
-  const initialValues: SearchI = {
-    author: "",
-    category: "",
-  };
-
   const formik = useFormik({
     initialValues,
     onSubmit: (values: SearchI) => {
       dispatch(addFilterParams(values));
-      setCount((c) => c + 1);
+      setCount(!count ? true : false);
     },
   });
 
@@ -130,10 +99,6 @@ const MainPage: React.FC = () => {
     setRangeValue(value);
   };
 
-  useEffect(() => {
-    dispatch(addFilterParams({ price: rangeValue }));
-  }, [rangeValue]);
-
   const clearFilter = () => {
     dispatch(
       addFilterParams({
@@ -145,10 +110,47 @@ const MainPage: React.FC = () => {
         page: 0,
       })
     );
-    formik.resetForm()
+    formik.resetForm();
     Url.params = {};
-    setCount((c) => c + 1);
+    setCount(!count ? true : false);
   };
+
+
+  useEffect(() => {
+    dispatch(getCategory());
+  }, []);
+  
+  useEffect(() => {
+    setPage(params.page === undefined ? 0 : params.page);
+    const newFilterSearch = checkFilterSearch(filterSearch);
+    dispatch(getBooks({ newFilterSearch }));
+    Url.params = { ...newFilterSearch };
+  }, [count]);
+
+  useEffect(() => {
+    let newFilterSearch = checkFilterSearch(filterSearch);
+    newFilterSearch = { ...newFilterSearch, page };
+    dispatch(getBooks({ newFilterSearch }));
+    if (page === 0) {
+      delete newFilterSearch.page;
+      Url.params = { ...newFilterSearch };
+    } else {
+      Url.params = { ...newFilterSearch };
+    }
+  }, [page]);
+
+  useEffect(() => {
+    let newFilterSearch = checkFilterSearch(params);
+    newFilterSearch = { ...newFilterSearch, page: params.page };
+    dispatch(addFilterParams(params));
+    dispatch(getBooks({ newFilterSearch }));
+    Url.params = params;
+  }, []);
+  
+  useEffect(() => {
+    dispatch(addFilterParams({ price: rangeValue }));
+  }, [rangeValue]);
+
 
   return (
     <StyledMainPage>
@@ -253,24 +255,14 @@ const MainPage: React.FC = () => {
         <div className="book-container">
           {books &&
             books.map((item) => (
-              <StyledBookCard key={item.id}>
-                <div className="image-container">
-                  <Link to={`/${item.id}`}>
-                    <img src={item.image && item.image} alt={item.title} />
-                  </Link>
-                </div>
-
-                <div className="book-option">
-                  <Link to={`/${item.id}`}>
-                    <div className="book-title">{item.title}</div>
-                    <div className="book-author">{item.author}</div>
-                  </Link>
-                  <div className="book-footer">
-                    <div> {item.price} ₽ </div>
-                    <button className="book-btn">Купить</button>
-                  </div>
-                </div>
-              </StyledBookCard>
+              <BookCard
+                id={item.id}
+                image={item.image}
+                title={item.title}
+                price={item.price}
+                author={item.author}
+                key={item.id}
+              />
             ))}
         </div>
       </StyledSection>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import "rc-rate/assets/index.css";
 import Rate from "rc-rate";
 
@@ -16,6 +16,7 @@ import {
   getBook,
   getFavourites,
   getReview,
+  isErrorBookSelector,
   isSuccessDeleteFavouriteSelector,
   isSuccessEditSelector,
   isSuccessFavouriteSelector,
@@ -36,21 +37,23 @@ interface MatchParams {
   id: string;
 }
 
-export interface addReviewI {
+export interface AddReviewI {
   text: string;
-  bookId: string;
-  userId: string;
+  bookId: number;
+  userId: number | null;
   userName?: string;
   createAt: string;
 }
 
 const BookPage: React.FC = () => {
   const isAuth = useAppSelector(isAuthSelector);
-  const [ratingValue, setRatingValue] = useState<string>("");
+  const [ratingValue, setRatingValue] = useState<number>(0);
   const dispatch = useAppDispatch();
   const review = useAppSelector(reviewSelector);
   const { id }: MatchParams = useParams();
+  const history = useHistory();
   const [editMode, setEditMode] = useState<boolean>(false);
+  const isErrorBook = useAppSelector(isErrorBookSelector);
   const isSuccessEdit = useAppSelector(isSuccessEditSelector);
   const isSuccessRating = useAppSelector(isSuccessRatingSelector);
   const userId: number | null = useAppSelector(userIdSelector);
@@ -62,21 +65,21 @@ const BookPage: React.FC = () => {
   const isSuccessDeleteFavourite = useAppSelector(
     isSuccessDeleteFavouriteSelector
   );
-  const [showReview, setShowReview] = useState<boolean>(true)
+  const [showReview, setShowReview] = useState<boolean>(true);
 
   const formik = useFormik({
     initialValues: {
       text: "",
-      bookId: id,
-      userId: String(userId),
+      bookId: +id,
+      userId,
       createAt: "",
-    } as addReviewI,
-    onSubmit: (values: addReviewI) => {
-      dispatch(addReview({ ...values, bookId: id, userId: String(userId) }));
+    } as AddReviewI,
+    onSubmit: (values: AddReviewI) => {
+      dispatch(addReview({ ...values, bookId: +id, userId: userId }));
       dispatch(
         addCurrentReview({
           ...values,
-          bookId: id,
+          bookId: +id,
           user: isAuth,
           createdAt: new Date().toISOString(),
         })
@@ -93,27 +96,38 @@ const BookPage: React.FC = () => {
     if (ratingValue) {
       dispatch(
         addRating({
-          value: String(ratingValue),
-          userId: String(userId),
-          bookId: id,
+          value: ratingValue,
+          userId: userId,
+          bookId: +id,
         })
       );
     }
   }, [ratingValue]);
 
   useEffect(() => {
-    dispatch(getFavourites());
+    if (isAuth) {
+      dispatch(getFavourites());
+    }
   }, [isSuccessFavourite, isSuccessDeleteFavourite]);
 
   useEffect(() => {
     dispatch(getBook(+id));
   }, [ratingValue, isSuccessRating, isSuccessEdit]);
 
+  useEffect(() => {
+    if (!book || isErrorBook) {
+      history.push("/");
+    }
+  }, [book, isErrorBook]);
+
   const handleAddFavourites = () => {
     dispatch(addFavourites({ bookId: +id }));
   };
 
-  const handleRatingChange = (value: string): void => {
+  const handleRatingChange = (value: number): void => {
+    if (!isAuth) {
+      history.push("/login");
+    }
     setRatingValue(value);
   };
 
@@ -125,11 +139,11 @@ const BookPage: React.FC = () => {
     dispatch(deleteFavourites({ bookId: +id }));
   };
   const handleShowReview = () => {
-    setShowReview(true)
-  }
-  const handleShowSnippet= () => {
-    setShowReview(false )
-  }
+    setShowReview(true);
+  };
+  const handleShowSnippet = () => {
+    setShowReview(false);
+  };
 
   return (
     <section>
@@ -172,7 +186,8 @@ const BookPage: React.FC = () => {
                       </div>
                       <Rate
                         allowClear={false}
-                        onChange={(value) => handleRatingChange(String(value))}
+                        defaultValue={book.rating && book.rating}
+                        onChange={(value) => handleRatingChange(value)}
                       />
                       <div>Отзывов: {review.length} </div>
                     </div>
@@ -193,31 +208,37 @@ const BookPage: React.FC = () => {
                   <b>Описание</b> <p>{book.description}</p>
                 </div>
                 <div className="book-options">
-                <div onClick={handleShowReview}>Отзывы</div>
-                <div onClick={handleShowSnippet}>Фрагмент</div>
-                </div> 
+                  <div onClick={handleShowReview}>Отзывы</div>
+                  <div onClick={handleShowSnippet}>Фрагмент</div>
+                </div>
               </StyledFullSizeBookCard>
-              
-                 
-               { isAuth && (
-                  <StyledForm onSubmit={formik.handleSubmit}>
-                    <b>Оставить отзыв:</b>
-                    <textarea
-                      id="text"
-                      name="text"
-                      onChange={formik.handleChange}
-                      value={formik.values.text}
-                    />
-                    <StyledButton type="submit">Отправить</StyledButton>
-                  </StyledForm>
-                )}
-             {showReview ? <div>Отзывы</div>  : <div>Ознакомительный фрагмент</div>}
-                  { showReview?  (Array.isArray(review) &&
-                    <Review review = {review} />) : <>{book.snippet}</> }
+
+              {isAuth && (
+                <StyledForm onSubmit={formik.handleSubmit}>
+                  <b>Оставить отзыв:</b>
+                  <textarea
+                    id="text"
+                    name="text"
+                    onChange={formik.handleChange}
+                    value={formik.values.text}
+                  />
+                  <StyledButton type="submit">Отправить</StyledButton>
+                </StyledForm>
+              )}
+              {showReview ? (
+                <div>Отзывы</div>
+              ) : (
+                <div>Ознакомительный фрагмент</div>
+              )}
+              {showReview ? (
+                Array.isArray(review) && <Review review={review} />
+              ) : (
+                <>{book.snippet}</>
+              )}
             </>
           )
         ) : (
-          <EditBook id={id} onChange={handleEditMode} book={book} />
+          <EditBook id={+id} onChange={handleEditMode} book={book} />
         )}
       </div>
     </section>

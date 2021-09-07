@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 import { useState } from "react";
 import { css } from "@emotion/react";
 import CircleLoader from "react-spinners/CircleLoader";
@@ -9,7 +9,7 @@ const override = css`
   border-color: red;
 `;
 
-const Spinner:React.FC = () => {
+const Spinner: React.FC = () => {
   let [loading, setLoading] = useState(true);
   let [color, setColor] = useState("#26a9e0");
 
@@ -18,6 +18,6 @@ const Spinner:React.FC = () => {
       <CircleLoader color={color} loading={loading} css={override} size={120} />
     </div>
   );
-}
+};
 
 export default Spinner;

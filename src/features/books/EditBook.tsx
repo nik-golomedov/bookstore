@@ -1,5 +1,6 @@
 import { useFormik } from "formik";
 import React from "react";
+import * as Yup from "yup";
 
 import { useAppDispatch, useAppSelector } from "../../common/hooks";
 import { BookI, editBook } from "./bookSlice";
@@ -11,7 +12,7 @@ import {
 import { userIdSelector } from "../auth/userSlice";
 
 interface EditBookPropsI {
-  id: string;
+  id: number;
   onChange: () => void;
   book: BookI;
 }
@@ -22,7 +23,6 @@ const EditBook: React.FC<EditBookPropsI> = ({
   book,
 }: EditBookPropsI) => {
   const dispatch = useAppDispatch();
-
   const initialValues: { description: string; price: number; snippet: string } =
     {
       description: String(book.description),
@@ -34,6 +34,10 @@ const EditBook: React.FC<EditBookPropsI> = ({
 
   const formik = useFormik({
     initialValues,
+    validationSchema: Yup.object({
+      description: Yup.string().required("Required"),
+      price: Yup.number().min(1).max(9999999).required("Required"),
+    }),
     onSubmit: (values: {
       description: string;
       snippet: string;
@@ -58,7 +62,9 @@ const EditBook: React.FC<EditBookPropsI> = ({
             onBlur={formik.handleBlur}
             value={formik.values.description}
           />
-
+          {formik.touched.description && formik.errors.description ? (
+            <div>{formik.errors.description}</div>
+          ) : null}
           <label htmlFor="price">Цена</label>
           <input
             id="price"
@@ -70,7 +76,9 @@ const EditBook: React.FC<EditBookPropsI> = ({
             onBlur={formik.handleBlur}
             value={formik.values.price}
           />
-
+          {formik.touched.price && formik.errors.price ? (
+            <div>{formik.errors.price}</div>
+          ) : null}
           <label htmlFor="snippet">Ознакомительный фрагмент</label>
           <input
             id="snippet"

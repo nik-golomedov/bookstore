@@ -12,7 +12,6 @@ import {
   loginSuccessSelector,
   loginUser,
 } from "./loginSlice";
-import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { getUserProfile } from "./userSlice";
 import ToggleEye from "../../common/ToggleEye";
 
@@ -33,14 +32,6 @@ const Login: React.FC = () => {
     setToggleEye(!toggleEye ? true : false);
   };
 
-  useEffect(() => {
-    if (loginSuccess) {
-      history.push("/");
-      dispatch(dropStateRequest());
-      dispatch(getUserProfile());
-    }
-  }, [loginSuccess]);
-
   const formik = useFormik({
     initialValues,
     validationSchema: Yup.object({
@@ -55,12 +46,26 @@ const Login: React.FC = () => {
     },
   });
 
+  const clearLoginState = (ms:number) => {
+    setTimeout(() => dispatch(dropStateRequest()), ms);
+  }
+
+  useEffect(() => {
+    if (loginSuccess) {
+      history.push("/");
+      dispatch(dropStateRequest());
+      dispatch(getUserProfile());
+    } else {
+      clearLoginState(5000)
+    }
+  }, [loginSuccess, errorLogin]);
+ 
   return (
     <StyledForm onSubmit={formik.handleSubmit}>
       <IconContext.Provider
         value={{ className: "react-icon__eye", size: "20px" }}
       >
-        <div>{errorLogin}</div>
+          <div>{errorLogin}</div>
         <label htmlFor="email">Email Address</label>
         <input
           id="email"
@@ -87,7 +92,6 @@ const Login: React.FC = () => {
           <div>{formik.errors.password}</div>
         ) : null}
         <button type="submit">Submit</button>
-        {status}
         <span>
           No account? <Link to="/signup">Sign Up</Link>{" "}
         </span>
