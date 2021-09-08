@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
-import { Link, useHistory } from "react-router-dom";
 import ReactPaginate from "react-paginate";
 import "react-input-range/lib/css/index.css";
 import Rate from "rc-rate";
@@ -14,6 +13,7 @@ import "rc-rate/assets/index.css";
 import { useAppDispatch, useAppSelector } from "../../common/hooks";
 import {
   addFilterParams,
+  addNotification,
   BookI,
   bookSelector,
   categorySelector,
@@ -38,7 +38,7 @@ export interface BooksI extends BookI {
 
 export interface SearchI {
   author?: string;
-  price?: number[];
+  price?: number[] | string;
   rating?: string;
   category?: string;
   order?: string;
@@ -56,7 +56,9 @@ const MainPage: React.FC = () => {
   const isFetchiingBooks = useAppSelector(isFetchingBooksSelector);
   const { params } = Url;
   const [page, setPage] = useState<number>(0);
-  const pageCount = total && Math.ceil(total / 8);
+
+  const [pageCount, setPageCount] = useState<number>(0);
+  console.log(pageCount);
   const initialValues: SearchI = {
     author: "",
     category: "",
@@ -67,7 +69,10 @@ const MainPage: React.FC = () => {
     if (filterSearch.author) newFilterSearch.author = filterSearch.author;
     if (filterSearch.rating && +filterSearch.rating !== 0)
       newFilterSearch.rating = filterSearch.rating;
-    if (filterSearch.price && filterSearch.price.length !== 0) {
+    if (Array.isArray(filterSearch.price) && filterSearch.price.length !== 0) {
+      newFilterSearch.price =
+        String(filterSearch.price[0]) + "," + String(filterSearch.price[1]);
+    } else if (filterSearch.price && filterSearch.price.length !== 0) {
       newFilterSearch.price = filterSearch.price;
     }
     if (filterSearch.category) newFilterSearch.category = filterSearch.category;
@@ -96,6 +101,7 @@ const MainPage: React.FC = () => {
   };
 
   const handleRangeChange = (value: number[]): void => {
+    console.log(value);
     setRangeValue(value);
   };
 
@@ -116,11 +122,15 @@ const MainPage: React.FC = () => {
   };
 
   useEffect(() => {
+    dispatch(addNotification(false));
+  }, []);
+
+  useEffect(() => {
     dispatch(getCategory());
   }, []);
 
   useEffect(() => {
-    setPage(params.page === undefined ? 0 : params.page);
+    setPage(0);
     const newFilterSearch = checkFilterSearch(filterSearch);
     dispatch(getBooks({ newFilterSearch }));
     Url.params = { ...newFilterSearch };
@@ -132,13 +142,12 @@ const MainPage: React.FC = () => {
     dispatch(getBooks({ newFilterSearch }));
     if (page === 0) {
       delete newFilterSearch.page;
-      Url.params = { ...newFilterSearch };
-    } else {
-      Url.params = { ...newFilterSearch };
     }
+    Url.params = { ...newFilterSearch };
   }, [page]);
 
   useEffect(() => {
+    setPage(params.page === undefined ? 0 : params.page);
     let newFilterSearch = checkFilterSearch(params);
     newFilterSearch = { ...newFilterSearch, page: params.page };
     dispatch(addFilterParams(params));
@@ -149,6 +158,10 @@ const MainPage: React.FC = () => {
   useEffect(() => {
     dispatch(addFilterParams({ price: rangeValue }));
   }, [rangeValue]);
+
+  useEffect(() => {
+    setPageCount(total && Math.ceil(total / 8));
+  }, [total]);
 
   return (
     <StyledMainPage>
@@ -174,7 +187,7 @@ const MainPage: React.FC = () => {
           </div>
           По цене
           <div>
-            min: {rangeValue[0]} max: {rangeValue[1]}
+            min: {+rangeValue[0]} max: {+rangeValue[1]}
             <Range
               min={1}
               value={rangeValue}
@@ -238,7 +251,7 @@ const MainPage: React.FC = () => {
               nextLabel={">"}
               pageCount={pageCount}
               onPageChange={handlePageClick}
-              pageRangeDisplayed={2}
+              pageRangeDisplayed={1}
               marginPagesDisplayed={2}
               disableInitialCallback={false}
               forcePage={+page}
@@ -251,6 +264,7 @@ const MainPage: React.FC = () => {
           ) : null}
         </div>
         <>{isFetchiingBooks && <Spinner />}</>
+        {total === 0 && <div className="book-notFound"> Ничего не найдено</div>}
         <div className="book-container">
           {books &&
             books.map((item) => (

@@ -37,7 +37,7 @@ export interface ReviewI {
   id?: number;
   user?: UserI | null;
   createdAt: string;
-  bookId: number,
+  bookId: number;
 }
 
 interface DataI {
@@ -56,6 +56,7 @@ export interface InitialStateGetBooksI {
   review: Array<ReviewI>;
   filter: SearchI;
   category: Array<CategoryI>;
+  notification: boolean;
   isFetching: boolean;
   isSuccess: boolean;
   isError: boolean;
@@ -245,6 +246,7 @@ export const editBook = createAsyncThunk(
   ) => {
     try {
       const response = await axios.patch("/books", values);
+      return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
@@ -275,6 +277,7 @@ const initialState: InitialStateGetBooksI = {
     page: 0,
   },
   category: [],
+  notification: false,
   isFetching: false,
   isSuccess: false,
   isSuccessRating: false,
@@ -285,7 +288,7 @@ const initialState: InitialStateGetBooksI = {
   isSuccessEdit: false,
   isError: false,
   isSuccessBook: false,
-  isErrorBook:false,
+  isErrorBook: false,
   errorsAddedBook: null,
   error: null,
 };
@@ -294,11 +297,14 @@ const booksSlice = createSlice({
   name: "books",
   initialState,
   reducers: {
-    addCurrentReview(state, action:PayloadAction<ReviewI>) {
+    addCurrentReview(state, action: PayloadAction<ReviewI>) {
       state.review && state.review.push(action.payload);
     },
     addFilterParams(state, action: PayloadAction<SearchI>) {
       state.filter = { ...state.filter, ...action.payload };
+    },
+    addNotification(state, action: PayloadAction<boolean>) {
+      state.notification = action.payload;
     },
     clearAddBookRequest(state) {
       state.isSuccessAddedBook = false;
@@ -404,8 +410,12 @@ const booksSlice = createSlice({
 
 export default booksSlice.reducer;
 
-export const { addCurrentReview, addFilterParams, clearAddBookRequest } =
-  booksSlice.actions;
+export const {
+  addCurrentReview,
+  addFilterParams,
+  clearAddBookRequest,
+  addNotification,
+} = booksSlice.actions;
 
 const allBooks = (state: RootState) => state.books;
 
@@ -464,16 +474,22 @@ export const isErrorBookSelector = createDraftSafeSelector(
   (state) => state.isErrorBook
 );
 
-export const isSuccessFavouriteSelector = createDraftSafeSelector(allBooks,
+export const isSuccessFavouriteSelector = createDraftSafeSelector(
+  allBooks,
   (state) => state.isSuccessFavourite
 );
 
-export const isSuccessDeleteFavouriteSelector = createDraftSafeSelector(allBooks,
+export const isSuccessDeleteFavouriteSelector = createDraftSafeSelector(
+  allBooks,
   (state) => state.isSuccessDeleteFavourite
 );
 
-export const isSuccessAddedBookSelector = createDraftSafeSelector(allBooks,
+export const isSuccessAddedBookSelector = createDraftSafeSelector(
+  allBooks,
   (state) => state.isSuccessAddedBook
 );
 
-export const errorsAddBookSelector = createDraftSafeSelector(allBooks,(state) => state.errorsAddedBook);
+export const errorsAddBookSelector = createDraftSafeSelector(
+  allBooks,
+  (state) => state.errorsAddedBook
+);

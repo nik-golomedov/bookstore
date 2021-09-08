@@ -344,6 +344,9 @@ export const StyledSection = styled.div`
     display: flex;
     flex-flow: wrap;
   }
+  .book-notFound {
+    margin:60px auto;
+  }
 `;
 
 export const StyledReview = styled.div`
@@ -396,7 +399,7 @@ export const StyledSubHeader = styled.div`
     text-decoration: none;
     color: #333;
   }
-  & a:hover {
+  & li:hover {
     color: #26a9e0;
     border-bottom: 5px solid #26a9e0;
   }
@@ -423,3 +426,28 @@ export const StyledEditBook = styled.div<StyledEditBookI>`
   width:100%;
   height:100%;
 `;
+
+export const StyledNotification = styled.div`
+  height: auto;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  padding:5px;
+  user-select:none;
+  border-radius:4px;
+  position: absolute;
+  color:#26a9e0;
+  top: 17%;
+  left: 13%;
+  animation: 1s lenear 0s appear;
+
+  @key-frames appear {
+    from {
+      left:8%;
+    }
+    to {
+      left:13%;
+    }
+  }
+`;
+
+

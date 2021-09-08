@@ -210,7 +210,9 @@ const BookPage: React.FC = () => {
                 </div>
                 <div className="book-options">
                   <div onClick={handleShowReview}>Отзывы</div>
-                  <div onClick={handleShowSnippet}>Фрагмент</div>
+                  {book.snippet && (
+                    <div onClick={handleShowSnippet}>Фрагмент</div>
+                  )}
                 </div>
               </StyledFullSizeBookCard>
 
@@ -229,14 +231,12 @@ const BookPage: React.FC = () => {
               {showReview ? (
                 <div>Отзывы</div>
               ) : (
-                <div>Ознакомительный фрагмент</div>
+                book.snippet && <div>Ознакомительный фрагмент</div>
               )}
               {showReview ? (
                 Array.isArray(review) && <Review review={review} />
               ) : (
-                <>
-                  <p>{book.snippet}</p>
-                </>
+                <>{book.snippet && <p>{book.snippet}</p>}</>
               )}
             </>
           )
