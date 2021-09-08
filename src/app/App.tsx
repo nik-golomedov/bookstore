@@ -7,7 +7,7 @@ import SignUp from "../features/auth/SignUp";
 import ProtectedRoute from "../common/ProtectedRoute";
 import SignRoute from "../common/SignRoute";
 import UserProfile from "../features/auth/UserProfile";
-import { getUserProfile } from "../features/auth/userSlice";
+import { getUserProfile, } from "../features/auth/userSlice";
 import { useAppDispatch } from "../common/hooks";
 import MainPage from "../features/books/MainPage";
 import AddBook from "../features/books/AddBook";
@@ -36,8 +36,8 @@ const App: React.FC = () => {
           <ProtectedRoute path="/addbook" exact component={AddBook} />
           <ProtectedRoute path="/favourite" exact component={Favourites} />
           <ProtectedRoute path="/addcategory" exact component={AddCategory} />
-          <Route path="/:id" exact component={BookPage} />
-          <Route path="/" component={MainPage} />
+          <Route path="/books/:id" exact component={BookPage} />
+          <Route path="/" exact component={MainPage} />
         </Switch>
       </Router>
     </main>

@@ -32,10 +32,6 @@ import {
 import Spinner from "../../common/Spinner";
 import BookCard from "../../common/BookCard";
 
-export interface BooksI extends BookI {
-  image: string;
-}
-
 export interface SearchI {
   author?: string;
   price?: number[] | string;
@@ -47,18 +43,17 @@ export interface SearchI {
 
 const MainPage: React.FC = () => {
   const dispatch = useAppDispatch();
-  const books: BooksI[] = useAppSelector(bookSelector);
+  const books: BookI[] = useAppSelector(bookSelector);
   const [rangeValue, setRangeValue] = useState<number[]>([1, 100000]);
   const filterSearch = useAppSelector(filterSelector);
   const total = useAppSelector(totalSelector);
   const [count, setCount] = useState<boolean>(false);
   const category = useAppSelector(categorySelector);
   const isFetchiingBooks = useAppSelector(isFetchingBooksSelector);
+  const [order, setOrder] = useState<string>("");
   const { params } = Url;
   const [page, setPage] = useState<number>(0);
-
   const [pageCount, setPageCount] = useState<number>(0);
-  console.log(pageCount);
   const initialValues: SearchI = {
     author: "",
     category: "",
@@ -101,11 +96,11 @@ const MainPage: React.FC = () => {
   };
 
   const handleRangeChange = (value: number[]): void => {
-    console.log(value);
     setRangeValue(value);
   };
 
   const clearFilter = () => {
+    formik.resetForm();
     dispatch(
       addFilterParams({
         author: "",
@@ -116,9 +111,14 @@ const MainPage: React.FC = () => {
         page: 0,
       })
     );
-    formik.resetForm();
+    setOrder("");
     Url.params = {};
     setCount(!count ? true : false);
+  };
+
+  const handleOrderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setOrder(e.target.value);
+    dispatch(addFilterParams({ order: e.target.value }));
   };
 
   useEffect(() => {
@@ -138,13 +138,15 @@ const MainPage: React.FC = () => {
 
   useEffect(() => {
     let newFilterSearch = checkFilterSearch(params);
-    newFilterSearch = { ...newFilterSearch, page };
+    newFilterSearch = order
+      ? { ...newFilterSearch, page, order }
+      : { ...newFilterSearch, page };
     dispatch(getBooks({ newFilterSearch }));
     if (page === 0) {
       delete newFilterSearch.page;
     }
     Url.params = { ...newFilterSearch };
-  }, [page]);
+  }, [page, order]);
 
   useEffect(() => {
     setPage(params.page === undefined ? 0 : params.page);
@@ -231,13 +233,10 @@ const MainPage: React.FC = () => {
           <select
             id="order"
             name="order"
-            value={formik.values.order}
-            defaultValue=""
-            onChange={formik.handleChange}
+            value={order}
+            onChange={handleOrderChange}
           >
-            <option value="" disabled>
-              Отсортировать
-            </option>
+            <option value="" disabled label="Сортировка" />
             <option value={"title_ASC"}>по алфавиту А-Я</option>
             <option value={"title_DESC"}>по алфавиту Я-А</option>
             <option value={"price_ASC"}>по цене (по возрастанию)</option>
@@ -251,8 +250,8 @@ const MainPage: React.FC = () => {
               nextLabel={">"}
               pageCount={pageCount}
               onPageChange={handlePageClick}
-              pageRangeDisplayed={1}
-              marginPagesDisplayed={2}
+              pageRangeDisplayed={2}
+              marginPagesDisplayed={1}
               disableInitialCallback={false}
               forcePage={+page}
               containerClassName="paginateContainer"

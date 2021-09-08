@@ -2,7 +2,6 @@ import React from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { GrLogin, GrLogout } from "react-icons/gr";
 import { Link, useHistory } from "react-router-dom";
-import { io } from "socket.io-client";
 
 import { useAppDispatch, useAppSelector } from "../common/hooks";
 import { clearUser } from "../features/auth/userSlice";

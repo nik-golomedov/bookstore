@@ -14,10 +14,13 @@ const ProtectedRoute: React.FC<{
     <Route
       {...rest}
       render={(props) =>
-        isAuth ? <Component {...props} {...rest} /> : <Redirect to="/login" />
+        isAuth ? (
+          <Component {...props} {...rest} />
+        ) : (
+          <Redirect to="/login" />
+        )
       }
     />
   );
 };
-
 export default ProtectedRoute;

@@ -13,7 +13,7 @@ import {
   getCategory,
   isSuccessAddedBookSelector,
 } from "./bookSlice";
-import { StyledButton, StyledForm } from "../../styledComponents/styled";
+import { StyledButton, StyledForm, StyledNotificationPopUp } from "../../styledComponents/styled";
 import { userIdSelector } from "../auth/userSlice";
 
 export interface initialValuesAddBookI {
@@ -79,6 +79,7 @@ const AddBook: React.FC = () => {
 
   return (
     <div>
+      
       <StyledForm smallWidth onSubmit={formik.handleSubmit}>
         <label htmlFor="title">Название</label>
         <input
@@ -170,7 +171,7 @@ const AddBook: React.FC = () => {
         <StyledButton type="submit">Добавить</StyledButton>
         {isSuccessAddedBook && (
           <FlashMessage duration={5000}>
-            <div> Книга успешно добавлена</div>
+            <StyledNotificationPopUp> Книга успешно добавлена</StyledNotificationPopUp>
           </FlashMessage>
         )}
         {errorsAddBook && (

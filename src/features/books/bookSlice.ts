@@ -9,7 +9,6 @@ import axios from "../../api/axios";
 import { initialValuesAddBookI } from "./AddBook";
 import { AddCategoryI } from "./AddCategory";
 import { AddReviewI } from "./Book";
-import { BooksI } from "./MainPage";
 import { UserI } from "../auth/userSlice";
 import { SearchI } from "./MainPage";
 import { RootState } from "../store";
@@ -41,7 +40,7 @@ export interface ReviewI {
 }
 
 interface DataI {
-  books: Array<BooksI>;
+  books: Array<BookI>;
   total: number;
 }
 
@@ -105,7 +104,7 @@ export const getBooks = createAsyncThunk(
       const response = await axios.get("/books", {
         params: { ...newFilterSearch },
       });
-      return response.data;
+      return response && response.data as DataI;
     } catch (error) {
       console.log(error);
     }
@@ -116,7 +115,7 @@ export const getBook = createAsyncThunk(
   "book/getBook",
   async (id: number, thunkAPI) => {
     try {
-      const response = await axios.get<BooksI>(`/books/${id}`);
+      const response = await axios.get<BookI>(`/books/${id}`);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -141,7 +140,7 @@ export const getReview = createAsyncThunk(
   async (id: string, thunkAPI) => {
     try {
       const response = await axios.get(`/review/${+id}`);
-      return response.data;
+      return response.data as ReviewI[];
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
@@ -171,7 +170,7 @@ export const getFavourites = createAsyncThunk(
   async () => {
     try {
       const response = await axios.get("/favourites");
-      return response.data;
+      return response.data as FavouritesI;
     } catch (error) {
       console.log(error);
     }
@@ -226,7 +225,7 @@ export const addCategory = createAsyncThunk(
 export const getCategory = createAsyncThunk("book/getCategory", async () => {
   try {
     const response = await axios.get("/category");
-    return response.data;
+    return response.data as CategoryI[];
   } catch (error) {
     console.log(error);
   }
@@ -332,7 +331,7 @@ const booksSlice = createSlice({
       state.isSuccess = false;
     }),
       builder.addCase(getBooks.fulfilled, (state, action) => {
-        state.data = action.payload;
+        state.data = action.payload!;
         state.isFetching = false;
         state.isError = false;
         state.isSuccess = true;
@@ -385,7 +384,7 @@ const booksSlice = createSlice({
       });
     builder.addCase(getReview.pending, (state, action) => {}),
       builder.addCase(getReview.fulfilled, (state, action) => {
-        state.review = action.payload;
+        state.review = action.payload!;
       }),
       builder.addCase(getReview.rejected, (state, action) => {});
     builder.addCase(addRating.pending, (state, action) => {
@@ -397,12 +396,12 @@ const booksSlice = createSlice({
       builder.addCase(addRating.rejected, (state, action) => {}),
       builder.addCase(getFavourites.pending, (state, action) => {}),
       builder.addCase(getFavourites.fulfilled, (state, action) => {
-        state.fav = action.payload;
+        state.fav = action.payload!;
       }),
       builder.addCase(getFavourites.rejected, (state, action) => {});
     builder.addCase(getCategory.pending, (state, action) => {}),
       builder.addCase(getCategory.fulfilled, (state, action) => {
-        state.category = action.payload;
+        state.category = action.payload!;
       }),
       builder.addCase(getCategory.rejected, (state, action) => {});
   },

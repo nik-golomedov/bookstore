@@ -36,7 +36,6 @@ const loginSlice = createSlice({
       state.isSuccess = false;
       state.isError = false;
       state.error = null;
-      state.status = "";
     },
   },
   extraReducers: (builder) => {
@@ -44,7 +43,6 @@ const loginSlice = createSlice({
       state.isFetching = true;
       state.isError = false;
       state.isSuccess = false;
-      state.status = "";
     }),
       builder.addCase(loginUser.fulfilled, (state, action) => {
         state.isFetching = false;
@@ -53,7 +51,6 @@ const loginSlice = createSlice({
         if (action.payload.token) {
           localStorage.setItem("isAuth", action.payload.token);
           state.isSuccess = true;
-          state.status = "Success";
         } else {
           state.error = action.payload.message;
         }

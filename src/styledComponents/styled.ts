@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 export const StyledHeader = styled.header`
   user-select: none;
@@ -71,6 +71,7 @@ export const StyledForm = styled.form<StyledFormPropsI>`
   align-items: ${(props) => (props.ai_fs ? "flex-start" : "center")} ;
   width:70%;
   margin:0 auto;
+  margin-bottom:20px;
   & textarea {
     resize:none;
     padding:8px;
@@ -345,7 +346,7 @@ export const StyledSection = styled.div`
     flex-flow: wrap;
   }
   .book-notFound {
-    margin:60px auto;
+    margin: 60px auto;
   }
 `;
 
@@ -426,28 +427,51 @@ export const StyledEditBook = styled.div<StyledEditBookI>`
   width:100%;
   height:100%;
 `;
-
+const appearNotification = keyframes`
+from {
+  left: 1%;
+}
+to {
+  left: 13%;
+}
+`;
 export const StyledNotification = styled.div`
   height: auto;
   background-color: #fff;
   border: 1px solid rgba(0, 0, 0, 0.2);
-  padding:5px;
-  user-select:none;
-  border-radius:4px;
+  padding: 5px;
+  user-select: none;
+  border-radius: 4px;
   position: absolute;
-  color:#26a9e0;
+  color: #26a9e0;
   top: 17%;
   left: 13%;
-  animation: 1s lenear 0s appear;
-
-  @key-frames appear {
-    from {
-      left:8%;
-    }
-    to {
-      left:13%;
-    }
-  }
+  animation: 1s linear 0s ${appearNotification};
 `;
 
+const appearPopUp = keyframes`
+from {
+  top: -330%;
+  right: -190%;
+}
+to {
+  top: -330%;
+  right: -120%;
+}
+`;
 
+export const StyledNotificationPopUp = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 220px;
+  height: 70px;
+  border: 1px solid #26a9e0;
+  border-radius: 4px;
+  color: #26a9e0;
+  background-color: #fff;
+  position: relative;
+  animation: 1s ease-in 0s ${appearPopUp};
+  top: -330%;
+  right: -120%;
+`;

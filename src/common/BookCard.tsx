@@ -20,13 +20,13 @@ const BookCard: React.FC<BookCardPropsI> = ({
   return (
     <StyledBookCard>
       <div className="image-container">
-        <Link to={`/${id}`}>
+        <Link to={`books/${id}`}>
           <img src={image && image} alt={title} />
         </Link>
       </div>
 
       <div className="book-option">
-        <Link to={`/${id}`}>
+        <Link to={`books/${id}`}>
           <div className="book-title">{title}</div>
           <div className="book-author">{author}</div>
         </Link>
