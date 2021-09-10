@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory, useLocation, useParams } from "react-router-dom";
 import "rc-rate/assets/index.css";
 import Rate from "rc-rate";
 
@@ -32,6 +32,7 @@ import {
 import EditBook from "./EditBook";
 import { isAuthSelector, userIdSelector } from "../auth/userSlice";
 import Review from "./Review";
+import { nanoid } from "@reduxjs/toolkit";
 
 interface MatchParams {
   id: string;
@@ -39,7 +40,7 @@ interface MatchParams {
 
 export interface AddReviewI {
   text: string;
-  bookId: number;
+  bookId: number | string;
   userId: number | null;
   userName?: string;
   createAt: string;
@@ -58,6 +59,7 @@ const BookPage: React.FC = () => {
   const isSuccessRating = useAppSelector(isSuccessRatingSelector);
   const userId: number | null = useAppSelector(userIdSelector);
   const book: BookI = useAppSelector(singleBookSelector);
+  const location=useLocation()
   const isFavourite = useAppSelector((state) =>
     state.books.fav.books.filter((item) => item.id === +id)
   );
@@ -80,6 +82,7 @@ const BookPage: React.FC = () => {
         addCurrentReview({
           ...values,
           bookId: +id,
+          id: nanoid(),
           user: isAuth,
           createdAt: new Date().toISOString(),
         })
@@ -113,7 +116,7 @@ const BookPage: React.FC = () => {
 
   useEffect(() => {
     dispatch(getBook(+id));
-  }, [ratingValue, isSuccessRating, isSuccessEdit]);
+  }, [ratingValue, isSuccessRating, isSuccessEdit,location]);
 
   useEffect(() => {
     if (!book || isErrorBook) {
@@ -139,9 +142,11 @@ const BookPage: React.FC = () => {
   const handleDeleteFavourites = () => {
     dispatch(deleteFavourites({ bookId: +id }));
   };
+
   const handleShowReview = () => {
     setShowReview(true);
   };
+  
   const handleShowSnippet = () => {
     setShowReview(false);
   };
@@ -161,20 +166,20 @@ const BookPage: React.FC = () => {
                   <div className="book-section">
                     {isAuth &&
                       (isFavourite.length === 0 ? (
-                        <div
+                        <button
                           className="book-favourites"
                           onClick={handleAddFavourites}
                         >
                           Добавить в избранное
                           <AiOutlineStar />
-                        </div>
+                        </button>
                       ) : (
-                        <div
+                        <button
                           className="book-favourites"
                           onClick={handleDeleteFavourites}
                         >
                           Удалить из избранного
-                        </div>
+                        </button>
                       ))}
                     <div>
                       <h1>{book.title}</h1>
@@ -205,7 +210,7 @@ const BookPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="book-snippet">
+                <div className="book-description">
                   <b>Описание</b> <p>{book.description}</p>
                 </div>
                 <div className="book-options">

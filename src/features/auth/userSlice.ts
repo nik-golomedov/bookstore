@@ -86,3 +86,11 @@ export const isAuthSelector = createDraftSafeSelector(
   (state) => state && state.user
 );
 
+export const isSuccessUserSelector = createDraftSafeSelector(
+  userState,
+  (state) => state && state.isSuccess
+);
+export const isErrorUserSelector = createDraftSafeSelector(
+  userState,
+  (state) => state && state.isError
+);

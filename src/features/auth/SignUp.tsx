@@ -37,7 +37,7 @@ const SignUp: React.FC = () => {
     validationSchema: Yup.object({
       fullName: Yup.string()
         .required("Required")
-        .matches(/\w+\s\w+/i, { message: "Enter: Firstname Lastname" }),
+        .matches(/^\w+\s\w+$/i, { message: "Enter: Firstname Lastname" }),
       email: Yup.string().email("Invalid email address").required("Required"),
       password: Yup.string()
         .min(6, "Must be 6 characters or more")
@@ -49,15 +49,15 @@ const SignUp: React.FC = () => {
       formik.resetForm();
     },
   });
-  const clearStatusDelay = (ms:number) => {
+  const clearStatusDelay = (ms: number) => {
     setTimeout(() => dispatch(clearStatus()), ms);
-  }
+  };
   useEffect(() => {
     if (status === "Registration success") {
       history.push("/login");
-      clearStatusDelay(1000)
+      clearStatusDelay(1000);
     } else {
-      clearStatusDelay(3000)
+      clearStatusDelay(3000);
     }
   }, [status]);
 

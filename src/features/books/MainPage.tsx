@@ -44,12 +44,12 @@ export interface SearchI {
 const MainPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const books: BookI[] = useAppSelector(bookSelector);
+  const total = useAppSelector(totalSelector);
   const [rangeValue, setRangeValue] = useState<number[]>([1, 100000]);
   const filterSearch = useAppSelector(filterSelector);
-  const total = useAppSelector(totalSelector);
   const [count, setCount] = useState<boolean>(false);
   const category = useAppSelector(categorySelector);
-  const isFetchiingBooks = useAppSelector(isFetchingBooksSelector);
+  const isFetchingBooks = useAppSelector(isFetchingBooksSelector);
   const [order, setOrder] = useState<string>("");
   const { params } = Url;
   const [page, setPage] = useState<number>(0);
@@ -189,13 +189,13 @@ const MainPage: React.FC = () => {
           </div>
           По цене
           <div>
-            min: {+rangeValue[0]} max: {+rangeValue[1]}
+            от: {+rangeValue[0]} ₽ до: {+rangeValue[1]} ₽
             <Range
               min={1}
               value={rangeValue}
               onChange={(value) => handleRangeChange(value)}
               max={999999}
-              count={100}
+              count={10}
             />
           </div>
           <div className="author-filter">
@@ -259,11 +259,15 @@ const MainPage: React.FC = () => {
               pageLinkClassName="pageLink"
               activeClassName="activePage"
               activeLinkClassName="activeLink"
+              previousLinkClassName="previousLink"
+              nextLinkClassName="nextLink"
             />
           ) : null}
         </div>
-        <>{isFetchiingBooks && <Spinner />}</>
-        {total === 0 && <div className="book-notFound"> Ничего не найдено</div>}
+        <>{isFetchingBooks && <Spinner />}</>
+        {total === 0 && !isFetchingBooks && (
+          <div className="book-notFound"> Ничего не найдено</div>
+        )}
         <div className="book-container">
           {books &&
             books.map((item) => (

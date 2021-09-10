@@ -14,13 +14,14 @@ import {
 } from "./loginSlice";
 import { getUserProfile } from "./userSlice";
 import ToggleEye from "../../common/ToggleEye";
+import { SocketI } from "../../app/Header";
 
 export interface LoginFormValuesI {
   email: string;
   password: string;
 }
 
-const Login: React.FC = () => {
+const Login: React.FC<SocketI> = ({socket}) => {
   const history = useHistory();
   const dispatch = useAppDispatch();
   const loginSuccess = useAppSelector(loginSuccessSelector);
@@ -55,6 +56,7 @@ const Login: React.FC = () => {
       history.push("/");
       dispatch(dropStateRequest());
       dispatch(getUserProfile());
+      socket?.connect();
     } else {
       clearLoginState(5000)
     }

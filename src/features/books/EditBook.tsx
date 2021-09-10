@@ -16,6 +16,11 @@ interface EditBookPropsI {
   onChange: () => void;
   book: BookI;
 }
+interface initialEditValues {
+  description: string;
+  price: number;
+  snippet: string;
+}
 
 const EditBook: React.FC<EditBookPropsI> = ({
   id,
@@ -23,12 +28,18 @@ const EditBook: React.FC<EditBookPropsI> = ({
   book,
 }: EditBookPropsI) => {
   const dispatch = useAppDispatch();
-  const initialValues: { description: string; price: number; snippet: string } =
-    {
-      description: String(book.description),
-      price: Number(book.price),
-      snippet: String(book.snippet),
-    };
+  const initialValues: initialEditValues = {
+    description: String(book.description),
+    price: Number(book.price),
+    snippet: book.snippet !=="null" ? String(book.snippet) : "",
+  };
+
+  const handleOnBlur = (
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    formik.setFieldValue(e.target.name, e.target.value.trim());
+    formik.handleBlur(e);
+  };
 
   const userId: number | null = useAppSelector(userIdSelector);
 
@@ -58,7 +69,7 @@ const EditBook: React.FC<EditBookPropsI> = ({
             id="description"
             name="description"
             onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            onBlur={handleOnBlur}
             value={formik.values.description}
           />
           {formik.touched.description && formik.errors.description ? (

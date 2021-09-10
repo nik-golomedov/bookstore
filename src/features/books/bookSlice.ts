@@ -33,10 +33,10 @@ export interface BookI {
 
 export interface ReviewI {
   text?: string;
-  id?: number;
+  id?: number | string;
   user?: UserI | null;
   createdAt: string;
-  bookId: number;
+  bookId: number | string;
 }
 
 interface DataI {
@@ -420,12 +420,12 @@ const allBooks = (state: RootState) => state.books;
 
 export const bookSelector = createDraftSafeSelector(
   allBooks,
-  (state) => state.data.books
+  (state) =>state.data && state.data.books
 );
 
 export const totalSelector = createDraftSafeSelector(
   allBooks,
-  (state) => state.data.total
+  (state) =>state.data && state.data.total
 );
 
 export const filterSelector = createDraftSafeSelector(
@@ -445,7 +445,7 @@ export const isFetchingBooksSelector = createDraftSafeSelector(
 
 export const favListSelector = createDraftSafeSelector(
   allBooks,
-  (state) => state.fav.books
+  (state) => state.fav && state.fav.books
 );
 
 export const reviewSelector = createDraftSafeSelector(

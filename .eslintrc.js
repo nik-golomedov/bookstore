@@ -15,5 +15,6 @@ module.exports = {
   plugins: ["react", "@typescript-eslint"],
   rules: {
     quotes: [2, "double"],
+    "react/prop-types": "off",
   },
 };

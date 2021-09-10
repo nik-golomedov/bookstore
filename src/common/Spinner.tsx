@@ -5,7 +5,7 @@ import CircleLoader from "react-spinners/CircleLoader";
 
 const override = css`
   display: block;
-  margin: 0 auto;
+  margin: 100px auto;
   border-color: red;
 `;
 

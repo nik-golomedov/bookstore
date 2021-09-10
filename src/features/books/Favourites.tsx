@@ -5,13 +5,17 @@ import { useAppDispatch, useAppSelector } from "../../common/hooks";
 import { favListSelector, getFavourites } from "./bookSlice";
 import { StyledSection } from "../../styledComponents/styled";
 import BookCard from "../../common/BookCard";
+import { isAuthSelector } from "../auth/userSlice";
 
 const Favourites: React.FC = () => {
   const dispatch = useAppDispatch();
   const favList = useAppSelector(favListSelector);
+  const isAuth = useAppSelector(isAuthSelector);
 
   useEffect(() => {
-    dispatch(getFavourites());
+    if (isAuth) {
+      dispatch(getFavourites());
+    }
   }, []);
 
   return (

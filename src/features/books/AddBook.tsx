@@ -13,7 +13,11 @@ import {
   getCategory,
   isSuccessAddedBookSelector,
 } from "./bookSlice";
-import { StyledButton, StyledForm, StyledNotificationPopUp } from "../../styledComponents/styled";
+import {
+  StyledButton,
+  StyledForm,
+  StyledNotificationPopUp,
+} from "../../styledComponents/styled";
 import { userIdSelector } from "../auth/userSlice";
 
 export interface initialValuesAddBookI {
@@ -51,11 +55,11 @@ const AddBook: React.FC = () => {
   const formik = useFormik({
     initialValues,
     validationSchema: Yup.object({
-      title: Yup.string().required("Required"),
+      title: Yup.string().max(255).required("Required"),
       description: Yup.string().required("Required"),
       price: Yup.number().min(1).max(9999999).required("Required"),
       category: Yup.number().required("Required"),
-      author: Yup.string().required("Required"),
+      author: Yup.string().max(255).required("Required"),
     }),
     onSubmit: (values: initialValuesAddBookI) => {
       dispatch(addBook({ ...values, creatorId: userId }));
@@ -68,6 +72,10 @@ const AddBook: React.FC = () => {
   ): void => {
     formik.setFieldValue("file", (event.currentTarget.files as FileList)[0]);
   };
+  const handleOnBlur = (e: React.FocusEvent<HTMLInputElement|HTMLTextAreaElement>) => {
+    formik.setFieldValue(e.target.name, e.target.value.trim())
+    formik.handleBlur(e);
+  };
 
   useEffect(() => {
     setTimeout(() => dispatch(clearAddBookRequest()), 2000);
@@ -79,7 +87,6 @@ const AddBook: React.FC = () => {
 
   return (
     <div>
-      
       <StyledForm smallWidth onSubmit={formik.handleSubmit}>
         <label htmlFor="title">Название</label>
         <input
@@ -87,7 +94,7 @@ const AddBook: React.FC = () => {
           name="title"
           type="text"
           onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
+          onBlur={(e) => handleOnBlur(e)}
           value={formik.values.title}
         />
         {formik.touched.title && formik.errors.title ? (
@@ -99,7 +106,7 @@ const AddBook: React.FC = () => {
           name="author"
           type="text"
           onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
+          onBlur={(e) => handleOnBlur(e)}
           value={formik.values.author}
         />
         {formik.touched.author && formik.errors.author ? (
@@ -110,7 +117,7 @@ const AddBook: React.FC = () => {
           id="description"
           name="description"
           onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
+          onBlur={(e) => handleOnBlur(e)}
           value={formik.values.description}
         />
         {formik.touched.description && formik.errors.description ? (
@@ -154,7 +161,7 @@ const AddBook: React.FC = () => {
           id="snippet"
           name="snippet"
           onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
+          onBlur={(e) => handleOnBlur(e)}
           value={formik.values.snippet}
         />
 
@@ -171,7 +178,10 @@ const AddBook: React.FC = () => {
         <StyledButton type="submit">Добавить</StyledButton>
         {isSuccessAddedBook && (
           <FlashMessage duration={5000}>
-            <StyledNotificationPopUp> Книга успешно добавлена</StyledNotificationPopUp>
+            <StyledNotificationPopUp>
+              {" "}
+              Книга успешно добавлена
+            </StyledNotificationPopUp>
           </FlashMessage>
         )}
         {errorsAddBook && (

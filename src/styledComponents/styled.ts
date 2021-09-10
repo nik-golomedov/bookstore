@@ -21,36 +21,33 @@ export const StyledHeader = styled.header`
     font-family: "Proza Libre", sans-serif;
     font-size: 44px;
   }
-  & .header-search {
-    width: 600px;
-  }
-  .header-search input {
-    width: 89.362%;
-    height: 40px;
-    padding: 0 0 0 10px;
-    box-sizing: border-box;
-    margin: 0;
-    border: none;
-    border-radius: 5px 0 0 5px;
-    font-size: 18px;
-    line-height: 40px;
-  }
-  .header-search button {
-    display: inline-block;
-    box-sizing: border-box;
-    text-align: center;
-    height: 40px;
-    width: 10.638%;
-    border: none;
-    border-radius: 0 5px 5px 0;
-    background-color: #1b75bb;
-    cursor: pointer;
-    color: #eee;
-    font-size: 17px;
+
+  .header-notification {
+    display: flex;
+    position: relative;
+    svg {
+      cursor: pointer;
+    }
+    & > .logout-btn {
+      margin-left: 200px;
+      cursor: pointer;
+    }
   }
   & .header-nav {
     display: flex;
     align-items: center;
+  }
+  .notification-count {
+    position: relative;
+    background-color: #fff;
+    color: rgba(0, 0, 0, 0.5);
+    font-size: 14px;
+    height: 18px;
+    width: 18px;
+    border-radius: 50%;
+    text-align: center;
+    left: -30%;
+    cursor: pointer;
   }
 `;
 
@@ -116,28 +113,30 @@ export const StyledBookCard = styled.div`
   border-radius: 4px;
   margin: 20px 20px 20px 0;
   background-color: #ffffff;
-  padding: 20px;
+
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 14px;
   transition: 0.1s ease-in;
-
+  cursor: pointer;
   a {
     text-decoration: none;
+    padding: 20px;
   }
   .image-container {
     max-width: 134px;
     max-height: 200px;
     margin-bottom: 12px;
   }
-
-  .image-container a {
+  .image-container .image-container__inner {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 200px;
     height: 200px;
   }
-
   .image-container img {
     max-width: 100%;
     max-height: 100%;
@@ -146,7 +145,6 @@ export const StyledBookCard = styled.div`
     vertical-align: middle;
     cursor: pointer;
   }
-
   .book-option {
     display: flex;
     flex-flow: column;
@@ -164,6 +162,10 @@ export const StyledBookCard = styled.div`
   }
   .book-author {
     color: rgba(0, 0, 0, 0.55);
+    width: 200px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
   .book-footer {
     width: 100%;
@@ -201,6 +203,7 @@ export const StyledFullSizeBookCard = styled.div`
   flex-flow: column;
   max-width: 1100px;
   margin-bottom: 100px;
+  word-break: break-all;
   .book-image {
     min-width: 460px;
     max-width: 500px;
@@ -222,8 +225,10 @@ export const StyledFullSizeBookCard = styled.div`
     align-items: space-between;
   }
   .book-favourites {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(15%, 66%, 88%, 0.1);
     padding: 0 20px;
+    border: none;
+
     cursor: pointer;
     margin-bottom: 10px;
     line-height: 32px;
@@ -295,7 +300,6 @@ export const StyledMainPage = styled.section`
     cursor: pointer;
     backgeound-color: white;
     padding: 10px;
-    box-shadow: 0 1px 4px rgb(0 0 0 / 4%);
   }
   .pageLink {
     padding: 5px 10px;
@@ -315,16 +319,24 @@ export const StyledMainPage = styled.section`
     transition: 0.2s ease-in;
     color: white;
   }
+  .previousLink {
+    padding: 5px 10px;
+  }
+  .nextLink {
+    padding: 5px 10px;
+  }
 `;
 export const StyledAside = styled.aside`
   width: 18.5%;
   height: 800px;
+  box-sizing: border-box;
   display: flex;
   flex-flow: column;
   align-items: center;
   justify-content: flex-start;
   margin: 20px 20px 0 10px;
   border-right: 1px solid rgba(0, 0, 0, 0.1);
+  padding-right: 20px;
   .author-filter {
     display: flex;
     flex-flow: column;
@@ -401,6 +413,7 @@ export const StyledSubHeader = styled.div`
     color: #333;
   }
   & li:hover {
+    padding-bottom: 3px;
     color: #26a9e0;
     border-bottom: 5px solid #26a9e0;
   }
@@ -426,27 +439,6 @@ export const StyledEditBook = styled.div<StyledEditBookI>`
   display: ${(props) => (props.display_none ? "none" : "absolute")}
   width:100%;
   height:100%;
-`;
-const appearNotification = keyframes`
-from {
-  left: 1%;
-}
-to {
-  left: 13%;
-}
-`;
-export const StyledNotification = styled.div`
-  height: auto;
-  background-color: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  padding: 5px;
-  user-select: none;
-  border-radius: 4px;
-  position: absolute;
-  color: #26a9e0;
-  top: 17%;
-  left: 13%;
-  animation: 1s linear 0s ${appearNotification};
 `;
 
 const appearPopUp = keyframes`
@@ -474,4 +466,31 @@ export const StyledNotificationPopUp = styled.div`
   animation: 1s ease-in 0s ${appearPopUp};
   top: -330%;
   right: -120%;
+`;
+
+interface StyledHeaderNotificationI {
+  displayNone?: boolean;
+}
+
+export const StyledHeaderNotification = styled.div<StyledHeaderNotificationI>`
+  display: ${(props) => (props.displayNone ? "none" : "flex")};
+  flex-flow: column;
+  width: 300px;
+  height: 9vh;
+  font-size: 14px;
+  background-color: #fff;
+  color: #26a9e0;
+  padding: 5px 10px;
+  border-radius: 4px;
+  overflow: auto;
+  word-break: break-all;
+  position: absolute;
+  border: 1px solid #26a9e0;
+  left: 10%;
+  top: 80%;
+`;
+
+export const StyledNotification = styled.div`
+  margin-bottom: 10px;
+  cursor: pointer;
 `;
