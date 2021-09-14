@@ -43,13 +43,12 @@ const App: React.FC = () => {
       setSocket(socket);
       socket.on("connect", () => {
         socket.emit("checkUser", isAuth);
-        socket.send("Hello!");
       });
     } else {
       socket?.disconnect();
     }
   }, [isAuth]);
-console.log(socket)
+
   useEffect(() => {
     dispatch(getUserProfile());
   }, []);

@@ -35,8 +35,11 @@ export interface ReviewI {
   text?: string;
   id?: number | string;
   user?: UserI | null;
+  targetUserId?: number | null;
+  targetUserName?: string | null;
   createdAt: string;
   bookId: number | string;
+  replies?: ReplyI[]
 }
 
 interface DataI {
@@ -46,6 +49,16 @@ interface DataI {
 
 interface FavouritesI {
   books: BookI[];
+}
+
+export interface ReplyI {
+  id?:number;
+  reviewId:number;
+  text:string;  
+  createdAt?:string;
+  user?:UserI
+  targetUserId?: number;
+  bookId:number;
 }
 
 export interface InitialStateGetBooksI {
@@ -134,6 +147,15 @@ export const addReview = createAsyncThunk(
     }
   }
 );
+
+export const addReply = createAsyncThunk("book/addReply", async (value:ReplyI, thunkAPI) => {
+  try {
+    const response = await axios.post("/reply", value)
+    return response.data
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response.data)
+  }
+})
 
 export const getReview = createAsyncThunk(
   "book/getReview",

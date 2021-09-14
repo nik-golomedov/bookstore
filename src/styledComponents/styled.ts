@@ -69,6 +69,12 @@ export const StyledForm = styled.form<StyledFormPropsI>`
   width:70%;
   margin:0 auto;
   margin-bottom:20px;
+  .cancel-targetuser {
+    color:#26a9e0;
+    display:inline-block;
+    margin-left:7px;
+    cursor:pointer;
+  }
   & textarea {
     resize:none;
     padding:8px;
@@ -362,30 +368,46 @@ export const StyledSection = styled.div`
   }
 `;
 
-export const StyledReview = styled.div`
-  width: 100%;
+interface StyledReviewPropsI {
+  reply?: boolean;
+}
+
+export const StyledReview = styled.div<StyledReviewPropsI>`
+  width: ${(props) => (props.reply ? "90%" : "100%")};
   height: auto;
   background-color: #ffffff;
-  dislay: flex;
+  display: flex;
   flex-flow: column;
-  padding: 24px;
-  margin: 20px 0;
+  padding: 24px 24px 12px 24px;
+  margin: ${(props) => (props.reply ? "20px 0 0 140px" : "20px 0")};
   font-size: 16px;
   border-radius: 5px;
   border: 1px solid #cccccc;
+  white-space: pre-line;
+  word-break: break-all;
 
   b {
     padding: 0;
     margin: 0;
   }
   & * {
-    margin: 0 10px 10px 10px;
+    margin: 0 10px 4px 0px;
   }
   & > div:first-of-type {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 30px;
+    justify-content: flex-start;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .review-time {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.7);
+  }
+  .review-footer {
+    color: #26a9e0;
+    cursor: pointer;
+    margin: 10px 0 0 130px;
+    text-align: start;
   }
 `;
 
@@ -493,4 +515,15 @@ export const StyledHeaderNotification = styled.div<StyledHeaderNotificationI>`
 export const StyledNotification = styled.div`
   margin-bottom: 10px;
   cursor: pointer;
+  .notification-time {
+    text-align: end;
+    margin-top: 4px;
+    color: #247fa7;
+  }
+`;
+
+export const StyledShowReply = styled.div`
+  color: #247fa7;
+  cursor: pointer;
+  margin: 0 0 40px 30px;
 `;

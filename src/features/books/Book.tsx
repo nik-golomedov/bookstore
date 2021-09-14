@@ -4,12 +4,14 @@ import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { useHistory, useLocation, useParams } from "react-router-dom";
 import "rc-rate/assets/index.css";
 import Rate from "rc-rate";
+import { nanoid } from "@reduxjs/toolkit";
 
 import { useAppDispatch, useAppSelector } from "../../common/hooks";
 import {
   addCurrentReview,
   addFavourites,
   addRating,
+  addReply,
   addReview,
   BookI,
   deleteFavourites,
@@ -32,18 +34,26 @@ import {
 import EditBook from "./EditBook";
 import { isAuthSelector, userIdSelector } from "../auth/userSlice";
 import Review from "./Review";
-import { nanoid } from "@reduxjs/toolkit";
 
 interface MatchParams {
   id: string;
 }
 
 export interface AddReviewI {
+  id?: number;
   text: string;
   bookId: number | string;
   userId: number | null;
   userName?: string;
-  createAt: string;
+  targetUserId?: number | null;
+  targetUserName?: string | null;
+  createdAt: string;
+}
+
+export interface TargetUserI {
+  id: number | null;
+  fullName?: string | null;
+  reviewId?: number;
 }
 
 const BookPage: React.FC = () => {
@@ -59,7 +69,7 @@ const BookPage: React.FC = () => {
   const isSuccessRating = useAppSelector(isSuccessRatingSelector);
   const userId: number | null = useAppSelector(userIdSelector);
   const book: BookI = useAppSelector(singleBookSelector);
-  const location=useLocation()
+  const location = useLocation();
   const isFavourite = useAppSelector((state) =>
     state.books.fav.books.filter((item) => item.id === +id)
   );
@@ -68,25 +78,45 @@ const BookPage: React.FC = () => {
     isSuccessDeleteFavouriteSelector
   );
   const [showReview, setShowReview] = useState<boolean>(true);
+  const [targetUser, setTargetUser] = useState<TargetUserI | null | undefined>({
+    id: null,
+  });
 
   const formik = useFormik({
     initialValues: {
       text: "",
       bookId: +id,
       userId,
-      createAt: "",
+      createdAt: "",
     } as AddReviewI,
     onSubmit: (values: AddReviewI) => {
-      dispatch(addReview({ ...values, bookId: +id, userId: userId }));
-      dispatch(
-        addCurrentReview({
-          ...values,
-          bookId: +id,
-          id: nanoid(),
-          user: isAuth,
-          createdAt: new Date().toISOString(),
-        })
-      );
+      if (!targetUser?.id) {
+        dispatch(
+          addReview({
+            ...values,
+            bookId: +id,
+            userId: userId,
+          })
+        );
+        dispatch(
+          addCurrentReview({
+            ...values,
+            bookId: +id,
+            id: nanoid(),
+            user: isAuth,
+            createdAt: new Date().toISOString(),
+          })
+        );
+      } else {
+        dispatch(
+          addReply({
+            text: values.text,
+            reviewId: targetUser.reviewId!,
+            targetUserId: targetUser.id,
+            bookId: +id,
+          })
+        );
+      }
       setShowReview(true);
       formik.resetForm();
     },
@@ -116,7 +146,7 @@ const BookPage: React.FC = () => {
 
   useEffect(() => {
     dispatch(getBook(+id));
-  }, [ratingValue, isSuccessRating, isSuccessEdit,location]);
+  }, [ratingValue, isSuccessRating, isSuccessEdit, location]);
 
   useEffect(() => {
     if (!book || isErrorBook) {
@@ -146,15 +176,22 @@ const BookPage: React.FC = () => {
   const handleShowReview = () => {
     setShowReview(true);
   };
-  
+
   const handleShowSnippet = () => {
     setShowReview(false);
+  };
+
+  const handleReviewClick = (value?: TargetUserI | null) => {
+    setTargetUser(value);
+  };
+
+  const cancelTargetUser = () => {
+    setTargetUser({ id: null, fullName: null });
   };
 
   return (
     <section>
       <div>
-        {" "}
         {!editMode ? (
           book && (
             <>
@@ -222,8 +259,20 @@ const BookPage: React.FC = () => {
               </StyledFullSizeBookCard>
 
               {isAuth && (
-                <StyledForm onSubmit={formik.handleSubmit}>
+                <StyledForm onSubmit={formik.handleSubmit} id="review">
                   <b>Оставить отзыв:</b>
+                  <span>
+                    {targetUser?.id && (
+                      <>
+                        <span>
+                          {targetUser?.id ? <span>Ответ на комментарий {targetUser?.fullName}</span> : null}
+                          <span onClick={cancelTargetUser}>
+                            <div className="cancel-targetuser">Отмена</div>
+                          </span>
+                        </span>
+                      </>
+                    )}
+                  </span>
                   <textarea
                     id="text"
                     name="text"
@@ -239,7 +288,13 @@ const BookPage: React.FC = () => {
                 book.snippet && <div>Ознакомительный фрагмент</div>
               )}
               {showReview ? (
-                Array.isArray(review) && <Review review={review} />
+                Array.isArray(review) && (
+                  <Review
+                    handleClick={handleReviewClick}
+                    userId={userId}
+                    review={review}
+                  />
+                )
               ) : (
                 <>{book.snippet && <p>{book.snippet}</p>}</>
               )}
