@@ -1,33 +1,34 @@
 import React, { useEffect, useState } from "react";
+
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Redirect,
 } from "react-router-dom";
+import { io, Socket } from "socket.io-client";
 
-import Header, { SocketI } from "./Header";
-import Login from "../features/auth/Login";
-import SignUp from "../features/auth/SignUp";
-import ProtectedRoute from "../common/ProtectedRoute";
-import SignRoute from "../common/SignRoute";
-import UserProfile from "../features/auth/UserProfile";
+import AddBook from "../components/AddBook";
+import AddCategory from "../components/AddCategory";
+import BookPage from "../components/BookPage";
+import Favourites from "../components/Favourites";
+import Header from "../components/Header";
+import Login from "../components/Login";
+import MainPage from "../components/MainPage";
+import NavBar from "../components/NavBar";
+import SignUp from "../components/SignUp";
+import Spinner from "../components/Spinner";
+import UserProfile from "../components/UserProfile";
+import ProtectedRoute from "../routes/ProtectedRoute";
+import SignRoute from "../routes/SignRoute";
+import { useAppDispatch, useAppSelector } from "../store";
 import {
   getUserProfile,
   isAuthSelector,
   isErrorUserSelector,
   isSuccessUserSelector,
-} from "../features/auth/userSlice";
-import { useAppDispatch, useAppSelector } from "../common/hooks";
-import MainPage from "../features/books/MainPage";
-import AddBook from "../features/books/AddBook";
-import BookPage from "../features/books/Book";
-import Favourites from "../features/books/Favourites";
-import SubHeader from "./SubHeader";
-import AddCategory from "../features/books/AddCategory";
+} from "../store/userSlice";
 import "./App.css";
-import Spinner from "../common/Spinner";
-import { io, Socket } from "socket.io-client";
 
 const App: React.FC = () => {
   const [initialize, setInitialize] = useState<boolean>(false);
@@ -39,9 +40,9 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (isAuth) {
-      const socket = io("http://localhost:8000");
-      setSocket(socket);
-      socket.on("connect", () => {
+      const socketIO = io("http://localhost:8000");
+      setSocket(socketIO);
+      socket?.on("connect", () => {
         socket.emit("checkUser", isAuth);
       });
     } else {
@@ -58,20 +59,21 @@ const App: React.FC = () => {
       setInitialize(true);
     }
   }, [isSuccessUser, isErrorUser]);
+
   return (
     <main className="App">
       <Router>
         {initialize ? (
           <>
             <Header socket={socket} />
-            <SubHeader />
+            <NavBar />
             <Switch>
               <SignRoute path="/signup" exact component={SignUp} />
               <SignRoute
                 path="/login"
                 exact
                 component={() => <Login socket={socket} />}
-              ></SignRoute>
+              />
               <ProtectedRoute path="/profile" exact component={UserProfile} />
               <ProtectedRoute path="/addbook" exact component={AddBook} />
               <ProtectedRoute path="/favourite" exact component={Favourites} />
@@ -83,7 +85,7 @@ const App: React.FC = () => {
               <Route path="/books/:id" exact component={BookPage} />
               <Route path="/" exact component={MainPage} />
               <Redirect to="/" />
-            </Switch>{" "}
+            </Switch>
           </>
         ) : (
           <Spinner />
