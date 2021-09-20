@@ -13,6 +13,10 @@ const StyledButton = styled.button<StyledButtonI>`
   font-size: 18px;
   height: 48px;
   cursor: pointer;
+  transition: 0.3s background-color;
+  &:hover {
+    background-color: #1b75bb;
+  }
 `;
 
 export default StyledButton;

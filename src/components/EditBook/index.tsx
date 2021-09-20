@@ -31,14 +31,17 @@ const EditBook: React.FC<EditBookPropsI> = ({
   const initialValues: initialEditValues = {
     description: String(book.description),
     price: Number(book.price),
-    snippet: book.snippet !== "null" ? String(book.snippet) : "",
+    snippet: (!book.snippet) ? "" : book.snippet,
   };
 
   const formik = useFormik({
     initialValues,
     validationSchema: Yup.object({
-      description: Yup.string().required("Required"),
-      price: Yup.number().min(1).max(9999999).required("Required"),
+      description: Yup.string().required("Обязательное поле"),
+      price: Yup.number()
+        .min(1, "Минимальная допустимая цена 1")
+        .max(9999999, "Максимальная допустимая цена 9999999")
+        .required("Обязательное поле"),
     }),
     onSubmit: (values: {
       description: string;

@@ -13,7 +13,7 @@ import {
 } from "../../store/userSlice";
 import { StyledListItem } from "../../UI/listItem/styledListItem";
 import Time from "../Time";
-import { StyledHeader, StyledHeaderNotification, StyledNotification } from "./components/StyledHeader";
+import { StyledHeader, StyledHeaderNotification, StyledNotification } from "./StyledHeader";
 
 interface NotifI {
   id: number;
@@ -34,7 +34,6 @@ const Header: React.FC<SocketI> = ({ socket }) => {
   const [newBooksNotification, setNewBooksNotification] = useState<NotifI[]>(
     [],
   );
-
   const handleClick = (): void => {
     localStorage.removeItem("isAuth");
     dispatch(clearUser());
@@ -67,12 +66,7 @@ const Header: React.FC<SocketI> = ({ socket }) => {
   };
 
   const showNotificationWindow = (): void => {
-    if (
-      newBooksNotification.length !== 0
-      || newCommentNotification.length !== 0
-    ) {
-      setIsNotification(!isNotification);
-    }
+    setIsNotification(!isNotification);
   };
 
   useEffect(() => {
@@ -130,9 +124,9 @@ const Header: React.FC<SocketI> = ({ socket }) => {
                         tabIndex={0}
                         onClick={(e) => handleClickNewBookNotification(e, item.id)}
                       >
-                        Добавлена книга
+                        <span>Добавлена книга </span>
                         {item.title}
-                        автор:
+                        <span>автор: </span>
                         {item.author}
                         {item.createdAt && (
                           <div className="notification-time">
@@ -154,7 +148,7 @@ const Header: React.FC<SocketI> = ({ socket }) => {
                           +item.id!,
                         )}
                       >
-                        На ваш комментарий ответили
+                        <span>На ваш комментарий ответили </span>
                         {item.text.slice(0, 30)}
                         {item.createdAt && (
                           <div className="notification-time">
@@ -162,8 +156,12 @@ const Header: React.FC<SocketI> = ({ socket }) => {
                           </div>
                         )}
                       </div>
+
                     </StyledNotification>
                   ))}
+                {(newBooksNotification.length === 0
+                         && newCommentNotification.length === 0)
+                         && <span>Новых оповещений нет</span>}
               </StyledHeaderNotification>
             </div>
           ) : (

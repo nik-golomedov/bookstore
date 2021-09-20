@@ -42,11 +42,16 @@ const AddBook: React.FC = () => {
   const formik = useFormik({
     initialValues,
     validationSchema: Yup.object({
-      title: Yup.string().max(255).required("Required"),
-      description: Yup.string().required("Required"),
-      price: Yup.number().min(1).max(9999999).required("Required"),
-      category: Yup.number().required("Required"),
-      author: Yup.string().max(255).required("Required"),
+      title: Yup.string()
+        .max(255, "Может быть 255 символов и меньше")
+        .required("Обязательное поле"),
+      description: Yup.string().required("Обязательное поле"),
+      price: Yup.number()
+        .min(1, "Минимальная допустимая цена 1")
+        .max(9999999, "Максимальная допустимая цена 9999999")
+        .required("Обязательное поле"),
+      category: Yup.number().required("Обязательное поле"),
+      author: Yup.string().max(255).required("Обязательное поле"),
     }),
     onSubmit: (values: InitialValuesAddBookI) => {
       dispatch(addBook({ ...values, creatorId: userId }));
@@ -169,11 +174,13 @@ const AddBook: React.FC = () => {
           </FlashMessage>
         )}
         {errorsAddBook && (
-          <FlashMessage duration={3000}>
-            <div>
-              Произошла ошибка при добавлении
-            </div>
-          </FlashMessage>
+        <FlashMessage duration={3000}>
+          {errorsAddBook === "Book already exist" ? (
+            <span>Книга уже существует</span>
+          ) : (
+            <span>Произошла ошибка при добавлении</span>
+          )}
+        </FlashMessage>
         )}
       </StyledForm>
     </StyledAddBook>
@@ -212,5 +219,8 @@ const StyledNotificationPopUp = styled.span`
 const StyledAddBook = styled.div`
   form {
     margin: 0 auto 20px;
+  }
+  div {
+    margin-top:10px;
   }
 `;

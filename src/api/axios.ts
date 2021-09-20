@@ -24,8 +24,8 @@ export const initResponseInt = (store: any) => {
       if (error.response.status === 401) {
         store.dispatch(clearUser());
         localStorage.removeItem("isAuth");
-        return Promise.reject(error);
       }
+      return Promise.reject(error);
     },
   );
 };

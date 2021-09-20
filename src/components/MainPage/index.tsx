@@ -103,7 +103,7 @@ const MainPage: React.FC = () => {
           <select
             id="order"
             name="order"
-            value={order}
+            value={params.order ? params.order : order}
             onChange={handleOrderChange}
           >
             <option value="" disabled label="Сортировка" />

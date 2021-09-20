@@ -49,11 +49,14 @@ const signUpSlice = createSlice({
       state.isSuccess = true;
       state.status = action.payload.message;
     });
-    builder.addCase(signUpUser.rejected, (state, action) => {
+    builder.addCase(signUpUser.rejected, (state, action: any) => {
       state.isFetching = false;
       state.isSuccess = false;
       state.isError = true;
-      state.error = action.payload;
+      state.status = action.payload
+        ? (action.payload.message as string)
+        : "Что то пошло не так";
+      state.error = action ? action.payload : "Ошибка";
     });
   },
 });

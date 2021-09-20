@@ -56,11 +56,14 @@ const loginSlice = createSlice({
         state.error = action.payload.message;
       }
     });
-    builder.addCase(loginUser.rejected, (state, action) => {
+    builder.addCase(loginUser.rejected, (state, action: any) => {
       state.isFetching = false;
       state.isSuccess = false;
       state.isError = true;
-      state.error = action.payload;
+
+      state.error = action.payload
+        ? (action.payload.message as string)
+        : "Что то пошло не так";
     });
   },
 });

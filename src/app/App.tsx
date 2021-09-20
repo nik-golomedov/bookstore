@@ -42,8 +42,8 @@ const App: React.FC = () => {
     if (isAuth) {
       const socketIO = io("http://localhost:8000");
       setSocket(socketIO);
-      socket?.on("connect", () => {
-        socket.emit("checkUser", isAuth);
+      socketIO?.on("connect", () => {
+        socketIO.emit("checkUser", isAuth);
       });
     } else {
       socket?.disconnect();

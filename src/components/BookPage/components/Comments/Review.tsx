@@ -18,10 +18,12 @@ const Review: React.FC<ReviewPropsI> = ({
   review,
   handleClick,
 }: ReviewPropsI) => {
-  const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [editIndex, setEditIndex] = useState<number[]>([]);
 
   const handleShowReplyClick = (index: number) => {
-    setEditIndex((prev) => (prev === index ? null : index));
+    setEditIndex((prev) => (prev?.includes(index)
+      ? prev.filter((item) => item !== index)
+      : [...prev, index]));
   };
 
   return (
@@ -31,13 +33,13 @@ const Review: React.FC<ReviewPropsI> = ({
           <StyledReview key={item.id}>
             <div>
               <div>
-                От:
+                <span>От: </span>
                 {item.user && item.user.fullName}
                 {item.targetUserName && (
-                <>
-                  Кому:
-                  {item.targetUserName}
-                </>
+                  <>
+                    Кому:
+                    {item.targetUserName}
+                  </>
                 )}
               </div>
               <div className="review-time">
@@ -45,14 +47,8 @@ const Review: React.FC<ReviewPropsI> = ({
               </div>
             </div>
             <div>{item.text}</div>
-            {item?.user?.id && (
-              <Link
-                to="review"
-                activeClass="active"
-                offset={-200}
-                spy
-                smooth
-              >
+            { item?.user?.id && (
+              <Link to="review" activeClass="active" offset={-200} spy smooth>
                 <div
                   role="button"
                   tabIndex={0}
@@ -72,7 +68,7 @@ const Review: React.FC<ReviewPropsI> = ({
           </StyledReview>
           {item.replies?.length !== 0 && (
             <StyledShowReply onClick={() => handleShowReplyClick(index)}>
-              {editIndex !== index ? (
+              {!editIndex?.includes(index) ? (
                 <span>
                   Показать ответы (
                   {item.replies?.length}
@@ -84,13 +80,11 @@ const Review: React.FC<ReviewPropsI> = ({
             </StyledShowReply>
           )}
 
-          {editIndex === index
+          {editIndex?.includes(index)
             && item?.replies
               ?.slice()
               .sort((a, b) => a?.createdAt!.localeCompare(b?.createdAt!))
-              .map((reply) => (
-                <Reply reply={reply} key={reply.id} />
-              ))}
+              .map((reply) => <Reply reply={reply} key={reply.id} />)}
         </React.Fragment>
       ))}
     </>

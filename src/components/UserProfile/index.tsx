@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 
+import moment from "moment";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 
@@ -35,16 +36,16 @@ const UserProfile: React.FC = () => {
       {userProfile && (
         <>
           <div className="user-fullName">
-            <b> Имя пользователя:</b>
+            <b> Имя пользователя: </b>
             {userProfile.fullName}
           </div>
           <div className="user-email">
-            <b>Email:</b>
+            <b>Email: </b>
             {userProfile.email}
           </div>
           <div className="user-dob">
-            <b>Дата рождения:</b>
-            {userProfile.dob?.slice(0, 10)}
+            <b>Дата рождения: </b>
+            {moment(userProfile.dob).format("DD-MM-YYYY")}
           </div>
         </>
       )}

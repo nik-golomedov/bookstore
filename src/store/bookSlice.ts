@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
   createSlice,
   createAsyncThunk,
@@ -56,15 +57,18 @@ interface InitialStateBooksI {
   isError: boolean;
   isSuccessAddedBook: boolean;
   isErrorAddedBook: boolean;
+  isSuccessAddCategory: boolean;
+  isErrorAddCategory: boolean;
   isSuccessFavourite: boolean;
-  isSuccessAddedReply:boolean;
-  isSuccessAddedReview:boolean;
+  isSuccessAddedReply: boolean;
+  isSuccessAddedReview: boolean;
   isSuccessDeleteFavourite: boolean;
   isSuccessEdit: boolean;
   isSuccessBook: boolean;
   isErrorBook: boolean;
   isSuccessRating: boolean;
-  errorsAddedBook: unknown;
+  errorsAddedCategory: string | null;
+  errorsAddedBook: string | null;
   error: unknown;
 }
 
@@ -89,7 +93,7 @@ export const addBook = createAsyncThunk(
       const response = await addBookApi(formData);
       return response.data;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
+      return thunkAPI.rejectWithValue(error.response.data);
     }
   },
 );
@@ -267,6 +271,8 @@ const initialState: InitialStateBooksI = {
   isSuccessRating: false,
   isSuccessFavourite: false,
   isSuccessAddedBook: false,
+  isSuccessAddCategory: false,
+  isErrorAddCategory: false,
   isErrorAddedBook: false,
   isSuccessDeleteFavourite: false,
   isSuccessEdit: false,
@@ -276,6 +282,7 @@ const initialState: InitialStateBooksI = {
   isSuccessBook: false,
   isErrorBook: false,
   errorsAddedBook: null,
+  errorsAddedCategory: null,
   error: null,
 };
 
@@ -304,7 +311,8 @@ const booksSlice = createSlice({
     builder.addCase(addBook.rejected, (state, action) => {
       state.isSuccessAddedBook = false;
       state.isErrorAddedBook = true;
-      state.errorsAddedBook = action.payload;
+      // @ts-ignore
+      state.errorsAddedBook = action.payload.message as string;
     });
     builder.addCase(getBooks.pending, (state) => {
       state.isFetching = true;
@@ -344,6 +352,20 @@ const booksSlice = createSlice({
     });
     builder.addCase(editBook.rejected, (state) => {
       state.isSuccessEdit = false;
+    });
+    builder.addCase(addCategory.pending, (state) => {
+      state.isSuccessAddCategory = false;
+      state.isErrorAddCategory = false;
+    });
+    builder.addCase(addCategory.fulfilled, (state) => {
+      state.isSuccessAddCategory = true;
+      state.isErrorAddCategory = false;
+    });
+    builder.addCase(addCategory.rejected, (state, action) => {
+      state.isSuccessAddCategory = false;
+      state.isErrorAddCategory = true;
+      // @ts-ignore
+      state.errorsAddedCategory = action.payload.message as string;
     });
     builder.addCase(addFavourites.pending, (state) => {
       state.isSuccessFavourite = false;
@@ -401,10 +423,7 @@ const booksSlice = createSlice({
 
 export default booksSlice.reducer;
 
-export const {
-  addFilterParams,
-  clearAddBookRequest,
-} = booksSlice.actions;
+export const { addFilterParams, clearAddBookRequest } = booksSlice.actions;
 
 const allBooks = (state: RootState) => state.books;
 
@@ -448,6 +467,16 @@ export const singleBookSelector = createDraftSafeSelector(
   (state) => state.singleBook,
 );
 
+export const isSuccessAddCategorySelector = createDraftSafeSelector(
+  allBooks,
+  (state) => state.isSuccessAddCategory,
+);
+
+export const isErrorAddCategorySelector = createDraftSafeSelector(
+  allBooks,
+  (state) => state.isErrorAddCategory,
+);
+
 export const isSuccessEditSelector = createDraftSafeSelector(
   allBooks,
   (state) => state.isSuccessEdit,
@@ -488,12 +517,20 @@ export const isSuccessAddedReviewSelector = createDraftSafeSelector(
   (state) => state.isSuccessAddedReview,
 );
 
+export const errorsAddedCategorySelector = createDraftSafeSelector(
+  allBooks,
+  (state) => state.errorsAddedCategory,
+);
+
 export const errorsAddBookSelector = createDraftSafeSelector(
   allBooks,
   (state) => state.errorsAddedBook,
 );
 
-export const isFavouriteSelector = (id: number) => createDraftSafeSelector(
-  allBooks,
-  (state: InitialStateBooksI) => state.fav.books.filter((item) => item.id === +id),
-);
+export const isFavouriteSelector = (id: number) =>
+  createDraftSafeSelector(
+    allBooks,
+    (state: InitialStateBooksI) =>
+      state.fav.books.filter((item) => item.id === +id),
+    // eslint-disable-next-line function-paren-newline
+  );

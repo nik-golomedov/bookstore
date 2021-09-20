@@ -7,6 +7,9 @@ export const StyledBookPage = styled.section`
   button {
     margin-top: 20px;
   }
+  form button {
+    margin-bottom: 40px;
+  }
 `;
 
 export const StyledFullSizeBookCard = styled.div`
@@ -36,15 +39,24 @@ export const StyledFullSizeBookCard = styled.div`
     flex-flow: column;
     align-items: space-between;
   }
-  .book-favourites {
+  .book-favorites {
     background-color: rgba(15%, 66%, 88%, 0.1);
     padding: 0 20px;
     border: none;
-
+    display: flex;
+    align-items: center;
     cursor: pointer;
     margin-bottom: 10px;
     line-height: 32px;
     width: 240px;
+    transition: 0.2s linear;
+    span {
+      margin-right: 10px;
+    }
+  }
+  .book-favorites:hover {
+    background-color: #3bbedb;
+    color: white;
   }
   .book-author {
     margin-bottom: 10px;
@@ -58,9 +70,12 @@ export const StyledFullSizeBookCard = styled.div`
 
   .book-rating {
     display: flex;
+    align-items: center;
     margin-top: 10px;
   }
-
+  .book-review__count {
+    margin-left: 25px;
+  }
   .book-add-rating {
     cursor: pointer;
     color: #26a9e0;
@@ -85,9 +100,17 @@ export const StyledFullSizeBookCard = styled.div`
       margin-top: 30px;
       padding: 10px;
       border: 1px solid rgba(0, 0, 0, 0.1);
+      transition: 0.2s linear;
     }
+  }
+  .book-options div:hover {
+    background-color: #26a9e0;
+    color: white;
   }
   button {
     margin-top: 20px;
+  }
+  .rc-rate-star {
+    color: grey;
   }
 `;

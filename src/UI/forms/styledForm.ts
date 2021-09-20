@@ -8,6 +8,7 @@ export const StyledForm = styled.form<StyledFormPropsI>`
   display: flex;
   flex-flow: column;
   justify-content: flex-start;
+  font-style: "Roboto", sans-serif;
   align-items: center;
   width: 70%;
   .cancel-targetuser {
@@ -17,15 +18,19 @@ export const StyledForm = styled.form<StyledFormPropsI>`
     cursor: pointer;
   }
   textarea {
+    box-sizing: border-box;
+    font-family: "Roboto", sans-serif;
     resize: none;
-    padding: 8px;
-    width: ${(props) => (props.smallWidth ? "290px" : "100%")};
+    padding: 10px;
+    width: ${(props) => (props.smallWidth ? "300px" : "100%")};
     height: 120px;
   }
   input,
   select {
+    box-sizing: border-box;
     width: 300px;
     height: 30px;
+    padding-left: 10px;
   }
   label {
     margin-top: 15px;
@@ -37,13 +42,22 @@ export const StyledForm = styled.form<StyledFormPropsI>`
     color: red;
     width: 300px;
     height: 25px;
+    margin-top: 10px;
   }
-  & > .react-icon__eye {
+  .react-icon__eye {
     margin-top: -25px;
     margin-left: 250px;
     cursor: pointer;
   }
   button {
     color: #fff;
+  }
+  input:focus,
+  textarea:focus {
+    outline: 1px solid #26a9e0;
+    border: none;
+  }
+  .form-password__error {
+    margin-top: 15px;
   }
 `;

@@ -58,7 +58,7 @@ export interface InitialStateSignI {
   isFetching: boolean;
   isSuccess: boolean;
   isError: boolean;
-  error: any;
+  error: unknown;
 }
 
 export interface InitialValuesAddBookI {
@@ -110,7 +110,7 @@ export interface SearchI {
   author?: string;
   price?: number[] | string;
   rating?: string;
-  category?: string;
+  category?: string | number;
   order?: string;
   page?: number;
 }

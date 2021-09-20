@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { useFormik } from "formik";
 import Rate from "rc-rate";
-import { AiFillStar, AiOutlineStar } from "react-icons/ai";
+import { AiOutlineStar } from "react-icons/ai";
 import { useHistory, useLocation, useParams } from "react-router-dom";
 
 import { AddReviewI, BookI, TargetUserI } from "../../interfaces";
@@ -52,7 +52,7 @@ const BookPage: React.FC = () => {
   const userId: number | null = useAppSelector(userIdSelector);
   const book: BookI = useAppSelector(singleBookSelector);
   const isSuccessReply = useAppSelector(isSuccessAddedReplySelector);
-  const isSucceessReview = useAppSelector(isSuccessAddedReviewSelector);
+  const isSuccessReview = useAppSelector(isSuccessAddedReviewSelector);
   const isFavourite = useAppSelector(isFavouriteSelector(+id));
   const isSuccessFavourite = useAppSelector(isSuccessFavouriteSelector);
   const isSuccessDeleteFavourite = useAppSelector(
@@ -93,6 +93,9 @@ const BookPage: React.FC = () => {
   };
 
   const handleReviewClick = (value: TargetUserI | null) => {
+    if (!isAuth) {
+      history.push("/login");
+    }
     setTargetUser(value);
   };
 
@@ -121,7 +124,7 @@ const BookPage: React.FC = () => {
           addReply({
             text: values.text,
             reviewId: targetUser.reviewId!,
-            targetUserId: targetUser.id,
+            targetUserId: +targetUser.id,
             bookId: +id,
           }),
         );
@@ -133,7 +136,7 @@ const BookPage: React.FC = () => {
 
   useEffect(() => {
     dispatch(getReview(+id));
-  }, [isSuccessReply, isSucceessReview]);
+  }, [isSuccessReply, isSuccessReview]);
 
   useEffect(() => {
     if (ratingValue) {
@@ -178,16 +181,16 @@ const BookPage: React.FC = () => {
                       && (isFavourite.length === 0 ? (
                         <button
                           type="button"
-                          className="book-favourites"
+                          className="book-favorites"
                           onClick={handleAddFavourites}
                         >
-                          Добавить в избранное
+                          <span>Добавить в избранное</span>
                           <AiOutlineStar />
                         </button>
                       ) : (
                         <button
                           type="button"
-                          className="book-favourites"
+                          className="book-favorites"
                           onClick={handleDeleteFavourites}
                         >
                           Удалить из избранного
@@ -199,17 +202,18 @@ const BookPage: React.FC = () => {
                     <div className="book-author">{book.author}</div>
                     <div>{book.category.value}</div>
                     <div className="book-rating">
-                      <div>
-                        <AiFillStar />
-                        {book.rating && book.rating.toFixed(2)}
-                      </div>
                       <Rate
                         allowClear={false}
                         defaultValue={book.rating && book.rating}
                         onChange={(value) => handleRatingChange(value)}
                       />
-                      <div>
-                        Отзывов:
+                      {book.rating && (
+                      <span>
+                        {book.rating.toFixed(2)}
+                      </span>
+                      ) }
+                      <div className="book-review__count">
+                        <span>Отзывов: </span>
                         {review.length}
                       </div>
                     </div>
@@ -230,19 +234,16 @@ const BookPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="book-description">
-                  <b>Описание</b>
-                  {" "}
+                  <b>Описание </b>
                   <p>{book.description}</p>
                 </div>
                 <div className="book-options">
                   <div role="button" tabIndex={0} onClick={handleShowReview}>
                     Отзывы
                   </div>
-                  {book.snippet && (
-                    <div role="button" tabIndex={0} onClick={handleShowSnippet}>
-                      Фрагмент
-                    </div>
-                  )}
+                  <div role="button" tabIndex={0} onClick={handleShowSnippet}>
+                    Ознакомительный фрагмент
+                  </div>
                 </div>
               </StyledFullSizeBookCard>
 
@@ -275,12 +276,12 @@ const BookPage: React.FC = () => {
                 </StyledForm>
               )}
               {showReview ? (
-                <div>Отзывы</div>
+                review.length !== 0 && <div>Отзывы</div>
               ) : (
                 book.snippet && <div>Ознакомительный фрагмент</div>
               )}
               {showReview ? (
-                Array.isArray(review) && (
+                review.length !== 0 && (
                   <Review
                     handleClick={handleReviewClick}
                     review={review}

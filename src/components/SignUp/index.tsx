@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 
 import { useFormik } from "formik";
+// @ts-ignore
+import FlashMessage from "react-flash-message";
 import { IconContext } from "react-icons";
 import { Link, useHistory } from "react-router-dom";
 import styled from "styled-components";
@@ -34,20 +36,23 @@ const SignUp: React.FC = () => {
     initialValues,
     validationSchema: Yup.object({
       fullName: Yup.string()
-        .required("Required")
-        .matches(/^\w+\s\w+$/i, { message: "Enter: Firstname Lastname" }),
-      email: Yup.string().email("Invalid email address").required("Required"),
+        .required("Обязательное поле")
+        .matches(/^\w+\s\w+$/i, {
+          message: "Введите данные в формате \"Имя Фамилия\"",
+        }),
+      email: Yup.string()
+        .email("Неправильный адрес электронной почты")
+        .required("Обязательное поле"),
       password: Yup.string()
-        .min(6, "Must be 6 characters or more")
-        .required("Required"),
-      dob: Yup.string().required("Required"),
+        .min(6, "Пароль должен быть 6 символов или больше")
+        .required("Обязательное поле"),
+      dob: Yup.string().required("Обязательное поле"),
     }),
     onSubmit: (values) => {
       dispatch(signUpUser(values));
       formik.resetForm();
     },
   });
-
   const togglePass = (): void => {
     setToggleEye(!toggleEye);
   };
@@ -56,10 +61,17 @@ const SignUp: React.FC = () => {
     setTimeout(() => dispatch(clearStatus()), ms);
   };
 
+  const handleOnBlur = (
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    formik.setFieldValue(e.target.name, e.target.value.trim());
+    formik.handleBlur(e);
+  };
+
   useEffect(() => {
     if (status === "Registration success") {
       history.push("/login");
-      clearStatusDelay(1000);
+      clearStatusDelay(5000);
     } else {
       clearStatusDelay(3000);
     }
@@ -71,8 +83,8 @@ const SignUp: React.FC = () => {
         <IconContext.Provider
           value={{ className: "react-icon__eye", size: "20px" }}
         >
-          {status !== "Registration success" && <div>{status}</div>}
-          <label htmlFor="fullName">Full Name</label>
+
+          <label htmlFor="fullName">Имя Фамилия</label>
           <input
             id="fullName"
             name="fullName"
@@ -85,7 +97,7 @@ const SignUp: React.FC = () => {
             <div>{formik.errors.fullName}</div>
           )}
 
-          <label htmlFor="email">Email Address</label>
+          <label htmlFor="email">Электронная почта</label>
           <input
             id="email"
             name="email"
@@ -98,25 +110,27 @@ const SignUp: React.FC = () => {
             <div>{formik.errors.email}</div>
           )}
 
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">Пароль</label>
           <input
             id="password"
             name="password"
             type={toggleEye ? "text" : "password"}
             onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            onBlur={handleOnBlur}
             value={formik.values.password}
           />
           <ToggleEye toggleEye={toggleEye} handleClick={togglePass} />
           {formik.touched.password && formik.errors.password && (
-            <div>{formik.errors.password}</div>
+            <div className="form-password__error">{formik.errors.password}</div>
           )}
 
-          <label htmlFor="dob">Date of birthday</label>
+          <label htmlFor="dob">Дата рождения</label>
           <input
             id="dob"
             name="dob"
             type="date"
+            min="1900-01-01"
+            max="2016-12-31"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.dob}
@@ -124,15 +138,25 @@ const SignUp: React.FC = () => {
           {formik.touched.dob && formik.errors.dob && (
             <div>{formik.errors.dob}</div>
           )}
+
           <StyledButton widthSmall type="submit">
-            Submit
+            Отправить
           </StyledButton>
 
           <span>
-            Already have account?
-            <Link to="/login"> Login</Link>
+            Уже есть аккаунт?
+            <Link to="/login"> Войти</Link>
           </span>
         </IconContext.Provider>
+        {status && (
+        <FlashMessage duration={2000}>
+          {status === "User already exist" ? (
+            <span>Пользователь с такой электронной почтой уже существует</span>
+          ) : (
+            <span>Произошла ошибка при регистрации</span>
+          )}
+        </FlashMessage>
+        )}
       </StyledForm>
     </StyledSignUp>
   );
@@ -146,6 +170,9 @@ const StyledSignUp = styled.div`
   }
   button {
     margin-top: 20px;
-    margin-bottom:20px;
+    margin-bottom: 20px;
+  }
+  input {
+    font-family: Roboto;
   }
 `;

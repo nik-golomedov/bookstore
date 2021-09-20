@@ -36,15 +36,24 @@ const MainPageAside: React.FC<AsidePropsI> = ({
   const dispatch = useAppDispatch();
   const [count, setCount] = useState<boolean>(false);
   const [rangeValue, setRangeValue] = useState<number[]>([1, 100000]);
+  const [ratingValue, setRatingValue] = useState<number>(0);
   const category = useAppSelector(categorySelector);
   const filterSearch = useAppSelector(filterSelector);
+  const { params } = Url;
   const initialValues: SearchI = {
-    author: "",
-    category: "",
+    author: params.author ? params.author : "",
+    category: params.category ? params.category : "",
   };
 
   const clearFilter = () => {
-    formik.resetForm();
+    // const newFilterSearch:SearchI = {
+    //   author: "",
+    //   price: [],
+    //   rating: "",
+    //   category: "",
+    //   order: "",
+    //   page: 0,
+    // };
     dispatch(
       addFilterParams({
         author: "",
@@ -55,12 +64,17 @@ const MainPageAside: React.FC<AsidePropsI> = ({
         page: 0,
       }),
     );
-    handleOrderResetClick();
+    formik.values.author = "";
+    formik.values.category = "";
+    setRangeValue([1, 100000]);
+    setRatingValue(0);
     Url.params = {};
+    handleOrderResetClick();
     setCount(!count);
   };
 
   const handleRatingChange = (value: number) => {
+    setRatingValue(value);
     dispatch(addFilterParams({ rating: String(value) }));
   };
 
@@ -91,6 +105,16 @@ const MainPageAside: React.FC<AsidePropsI> = ({
     Url.params = { ...newFilterSearch };
   }, [count]);
 
+  useEffect(() => {
+    if (params.price) {
+      const searchParamsRange = params?.price?.split(",");
+      setRangeValue([+searchParamsRange[0], +searchParamsRange[1]]);
+    }
+    if (params.rating) {
+      setRatingValue(params.rating);
+    }
+  }, []);
+
   return (
     <StyledAside>
       Фильтрация
@@ -114,9 +138,10 @@ const MainPageAside: React.FC<AsidePropsI> = ({
         </div>
         По цене
         <div>
-          от:
+          <span>от: </span>
           {+rangeValue[0]}
-          ₽ до:
+          <span>₽ </span>
+          <span>до: </span>
           {+rangeValue[1]}
           ₽
           <Range
@@ -142,6 +167,7 @@ const MainPageAside: React.FC<AsidePropsI> = ({
           <Rate
             defaultValue={0}
             allowClear
+            value={ratingValue}
             onChange={(value) => handleRatingChange(value)}
           />
         </div>
@@ -149,7 +175,7 @@ const MainPageAside: React.FC<AsidePropsI> = ({
           <StyledButton widthSmall type="submit">
             Поиск
           </StyledButton>
-          <StyledButton widthSmall type="submit" onClick={clearFilter}>
+          <StyledButton widthSmall type="button" onClick={clearFilter}>
             Сброс
           </StyledButton>
         </div>
@@ -182,5 +208,8 @@ const StyledAside = styled.aside`
   }
   button {
     margin-top:20px;
+  }
+  .rc-rate-star {
+    color: grey;
   }
 `;
