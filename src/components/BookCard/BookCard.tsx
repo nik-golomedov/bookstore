@@ -3,6 +3,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
+import { BASE_URL } from "../../api/axios";
+
 interface BookCardPropsI {
   id: number;
   image: string;
@@ -22,7 +24,7 @@ const BookCard: React.FC<BookCardPropsI> = ({
     <Link to={`books/${id}`}>
       <div className="image-container">
         <div className="image-container__inner">
-          <img src={image && image} alt={title} />
+          <img src={image && `${BASE_URL}/${image}`} alt={title} />
         </div>
       </div>
       <div className="book-option">

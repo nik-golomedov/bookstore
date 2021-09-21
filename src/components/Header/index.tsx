@@ -1,3 +1,5 @@
+/* eslint-disable array-callback-return */
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 
 import { FiLogOut, FiLogIn } from "react-icons/fi";
@@ -5,35 +7,28 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { IconContext } from "react-icons/lib";
 import { Link, useHistory } from "react-router-dom";
 
-import { AddReviewI, BookI, SocketI } from "../../interfaces";
+import { DataNotificationI, SocketI } from "../../interfaces";
 import { useAppDispatch, useAppSelector } from "../../store";
-import {
-  clearUser,
-  isAuthSelector,
-} from "../../store/userSlice";
+import { deleteNotification, getNotification } from "../../store/notificationSlice";
+import { clearUser, isAuthSelector } from "../../store/userSlice";
 import { StyledListItem } from "../../UI/listItem/styledListItem";
 import Time from "../Time";
-import { StyledHeader, StyledHeaderNotification, StyledNotification } from "./StyledHeader";
-
-interface NotifI {
-  id: number;
-  author: string;
-  title: string;
-  createdAt?: string;
-}
+import {
+  StyledHeader,
+  StyledHeaderNotification,
+  StyledNotification,
+} from "./StyledHeader";
 
 const Header: React.FC<SocketI> = ({ socket }) => {
   const isAuth = useAppSelector(isAuthSelector);
   const dispatch = useAppDispatch();
+  const notification = useAppSelector((state) => state.notifications && state.notifications.data);
   const history = useHistory();
   const [isNotification, setIsNotification] = useState<boolean>(false);
-  const [newCommentNotification, setNewCommentNotification] = useState<
-    AddReviewI[]
-  >([]);
-
-  const [newBooksNotification, setNewBooksNotification] = useState<NotifI[]>(
+  const [newNotification, setNewNotification] = useState<DataNotificationI[]>(
     [],
   );
+
   const handleClick = (): void => {
     localStorage.removeItem("isAuth");
     dispatch(clearUser());
@@ -41,28 +36,16 @@ const Header: React.FC<SocketI> = ({ socket }) => {
     history.push("/login");
   };
 
-  const handleClickNewBookNotification = (
+  const handleClickNewNotification = (
     e: React.MouseEvent<HTMLDivElement>,
+    bookId:number,
     id: number,
   ) => {
     e.stopPropagation();
-    history.push(`/books/${id}`);
-    setNewBooksNotification(
-      newBooksNotification.filter((item) => item.id !== id),
-    );
-    setIsNotification(true);
-  };
-
-  const handleClickCommentNotification = (
-    e: React.MouseEvent<HTMLDivElement>,
-    bookId: number,
-    id: number,
-  ) => {
-    e.stopPropagation();
+    setNewNotification((prev) => prev.filter((item) => item.id !== id));
+    dispatch(deleteNotification(id));
     history.push(`/books/${bookId}`);
-    setNewCommentNotification(
-      newCommentNotification.filter((item) => item.id !== id),
-    );
+    setIsNotification(true);
   };
 
   const showNotificationWindow = (): void => {
@@ -70,25 +53,34 @@ const Header: React.FC<SocketI> = ({ socket }) => {
   };
 
   useEffect(() => {
-    socket?.on("bookAdded", (data: BookI) => {
-      setNewBooksNotification((prev) => [...prev, data]);
+    socket?.on("bookAdded", (data: DataNotificationI) => {
+      setNewNotification((prev) => [...prev, data]);
     });
-  }, []);
+    socket?.on("newComment", (data: DataNotificationI) => {
+      setNewNotification((prev) => [...prev, data]);
+    });
+    socket?.on("disconnect", () => {
+      setNewNotification([]);
+    });
+  }, [socket]);
 
   useEffect(() => {
-    socket?.on("newComment", (data) => {
-      setNewCommentNotification((prev) => [...prev, data]);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (
-      newBooksNotification.length === 0
-      && newCommentNotification.length === 0
-    ) {
+    if (newNotification.length === 0) {
       setIsNotification(false);
     }
-  }, [newBooksNotification, newCommentNotification]);
+  }, [newNotification]);
+
+  useEffect(() => {
+    dispatch(getNotification());
+  }, [isAuth]);
+
+  useEffect(() => {
+    setNewNotification(notification);
+  }, [notification]);
+
+  useEffect(() => {
+    setNewNotification(newNotification);
+  }, [newNotification]);
 
   return (
     <StyledHeader>
@@ -104,11 +96,9 @@ const Header: React.FC<SocketI> = ({ socket }) => {
                 onClick={showNotificationWindow}
               >
                 <IoMdNotificationsOutline />
-                {(newBooksNotification.length !== 0
-                  || newCommentNotification.length !== 0) && (
+                {newNotification.length !== 0 && (
                   <div className="notification-count">
-                    {+newBooksNotification.length
-                      + +newCommentNotification.length}
+                    {+newNotification.length}
                   </div>
                 )}
               </div>
@@ -116,18 +106,15 @@ const Header: React.FC<SocketI> = ({ socket }) => {
                 <FiLogOut onClick={handleClick} />
               </StyledListItem>
               <StyledHeaderNotification displayNone={!isNotification}>
-                {newBooksNotification.length !== 0
-                  && newBooksNotification.map((item) => (
+                {newNotification.length !== 0
+                  && newNotification.map((item) => (
                     <StyledNotification key={item.id}>
                       <div
                         role="button"
                         tabIndex={0}
-                        onClick={(e) => handleClickNewBookNotification(e, item.id)}
+                        onClick={(e) => handleClickNewNotification(e, item.bookId!, item.id!)}
                       >
-                        <span>Добавлена книга </span>
-                        {item.title}
-                        <span>автор: </span>
-                        {item.author}
+                        <span>{item.message}</span>
                         {item.createdAt && (
                           <div className="notification-time">
                             <Time createTime={item.createdAt!} />
@@ -136,32 +123,9 @@ const Header: React.FC<SocketI> = ({ socket }) => {
                       </div>
                     </StyledNotification>
                   ))}
-                {newCommentNotification.length !== 0
-                  && newCommentNotification.map((item) => (
-                    <StyledNotification key={item.id}>
-                      <div
-                        role="button"
-                        tabIndex={0}
-                        onClick={(e) => handleClickCommentNotification(
-                          e,
-                          +item.bookId,
-                          +item.id!,
-                        )}
-                      >
-                        <span>На ваш комментарий ответили </span>
-                        {item.text.slice(0, 30)}
-                        {item.createdAt && (
-                          <div className="notification-time">
-                            <Time createTime={item.createdAt!} />
-                          </div>
-                        )}
-                      </div>
-
-                    </StyledNotification>
-                  ))}
-                {(newBooksNotification.length === 0
-                         && newCommentNotification.length === 0)
-                         && <span>Новых оповещений нет</span>}
+                {newNotification.length === 0 && (
+                  <span>Новых оповещений нет</span>
+                )}
               </StyledHeaderNotification>
             </div>
           ) : (

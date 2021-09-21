@@ -40,14 +40,18 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (isAuth) {
-      const socketIO = io("http://localhost:8000");
+      const socketIO = io("http://localhost:8000", { forceNew: true });
       setSocket(socketIO);
       socketIO?.on("connect", () => {
-        socketIO.emit("checkUser", isAuth);
+
       });
+      socketIO.emit("checkUser", isAuth);
     } else {
       socket?.disconnect();
     }
+    return () => {
+      socket?.disconnect();
+    };
   }, [isAuth]);
 
   useEffect(() => {
@@ -75,10 +79,10 @@ const App: React.FC = () => {
                 component={() => <Login socket={socket} />}
               />
               <ProtectedRoute path="/profile" exact component={UserProfile} />
-              <ProtectedRoute path="/addbook" exact component={AddBook} />
+              <ProtectedRoute path="/add-book" exact component={AddBook} />
               <ProtectedRoute path="/favourite" exact component={Favourites} />
               <ProtectedRoute
-                path="/addcategory"
+                path="/add-category"
                 exact
                 component={AddCategory}
               />

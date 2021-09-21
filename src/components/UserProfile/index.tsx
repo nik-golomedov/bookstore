@@ -24,11 +24,11 @@ const UserProfile: React.FC = () => {
   }, []);
 
   const handleClickAddCategory = () => {
-    history.push("/addcategory");
+    history.push("/add-category");
   };
 
   const handleClickAddBook = () => {
-    history.push("/addbook");
+    history.push("/add-book");
   };
 
   return (

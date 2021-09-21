@@ -5,12 +5,12 @@ import Rate from "rc-rate";
 import { AiOutlineStar } from "react-icons/ai";
 import { useHistory, useLocation, useParams } from "react-router-dom";
 
+import { BASE_URL } from "../../api/axios";
 import { AddReviewI, BookI, TargetUserI } from "../../interfaces";
 import { useAppDispatch, useAppSelector } from "../../store";
 import {
   addFavourites,
   addRating,
-  addReply,
   addReview,
   deleteFavourites,
   getBook,
@@ -121,7 +121,7 @@ const BookPage: React.FC = () => {
         );
       } else {
         dispatch(
-          addReply({
+          addReview({
             text: values.text,
             reviewId: targetUser.reviewId!,
             targetUserId: +targetUser.id,
@@ -174,7 +174,7 @@ const BookPage: React.FC = () => {
               <StyledFullSizeBookCard key={book.id}>
                 <div className="book-main">
                   <div className="book-image">
-                    <img src={book.image && book.image} alt={book.title} />
+                    <img src={book.image && `${BASE_URL}/${book.image}`} alt={book.title} />
                   </div>
                   <div className="book-section">
                     {isAuth

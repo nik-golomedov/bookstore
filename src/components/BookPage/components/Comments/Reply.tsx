@@ -2,12 +2,12 @@ import React from "react";
 
 import { Link } from "react-scroll";
 
-import { ReplyI } from "../../../../interfaces";
+import { ReviewI } from "../../../../interfaces";
 import Time from "../../../Time";
 import StyledReview from "./StyledReview";
 
 interface ReplyPropsI {
-  reply: ReplyI;
+  reply: ReviewI;
 }
 
 const Reply: React.FC<ReplyPropsI> = ({ reply }) => (

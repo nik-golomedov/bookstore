@@ -50,7 +50,7 @@ export interface ReviewI {
   targetUserName?: string | null;
   createdAt: string;
   bookId: number | string;
-  replies?: ReplyI[];
+  reviews?: ReviewI[];
 }
 
 export interface InitialStateSignI {
@@ -81,9 +81,11 @@ export interface AddCategoryI {
 export interface AddReviewI {
   id?: number;
   text: string;
+  reviewId?: number;
+  targetUserId?: number;
   bookId: number | string;
-  userId: number | null;
-  createdAt: string;
+  userId?: number | null;
+  createdAt?: string;
 }
 
 export interface AddFavI {
@@ -124,4 +126,13 @@ export interface SignUpFormValuesI {
   email: string;
   password: string;
   dob: string;
+}
+
+export interface DataNotificationI {
+  id?: number;
+  userId?: number;
+  message: string;
+  type: string;
+  bookId?: number;
+  createdAt?: string;
 }

@@ -12,7 +12,6 @@ import {
   addCategoryApi,
   addFavouritesApi,
   addRatingApi,
-  addReplyApi,
   addReviewApi,
   deleteFavouritesApi,
   editBookApi,
@@ -31,7 +30,6 @@ import {
   EditBookI,
   InitialValuesAddBookI,
   RatingI,
-  ReplyI,
   ReviewI,
   SearchI,
 } from "../interfaces";
@@ -127,18 +125,6 @@ export const addReview = createAsyncThunk(
   async (value: AddReviewI, thunkAPI) => {
     try {
       const response = await addReviewApi(value);
-      return response.data;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  },
-);
-
-export const addReply = createAsyncThunk(
-  "book/addReply",
-  async (value: ReplyI, thunkAPI) => {
-    try {
-      const response = await addReplyApi(value);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -396,15 +382,6 @@ const booksSlice = createSlice({
     });
     builder.addCase(addReview.rejected, (state) => {
       state.isSuccessAddedReview = false;
-    });
-    builder.addCase(addReply.pending, (state) => {
-      state.isSuccessAddedReply = false;
-    });
-    builder.addCase(addReply.fulfilled, (state) => {
-      state.isSuccessAddedReply = true;
-    });
-    builder.addCase(addReply.rejected, (state) => {
-      state.isSuccessAddedReply = false;
     });
     builder.addCase(addRating.pending, (state) => {
       state.isSuccessRating = false;

@@ -66,12 +66,12 @@ const Review: React.FC<ReviewPropsI> = ({
               </Link>
             )}
           </StyledReview>
-          {item.replies?.length !== 0 && (
+          {item.reviews?.length !== 0 && (
             <StyledShowReply onClick={() => handleShowReplyClick(index)}>
               {!editIndex?.includes(index) ? (
                 <span>
                   Показать ответы (
-                  {item.replies?.length}
+                  {item.reviews?.length}
                   )
                 </span>
               ) : (
@@ -81,7 +81,7 @@ const Review: React.FC<ReviewPropsI> = ({
           )}
 
           {editIndex?.includes(index)
-            && item?.replies
+            && item?.reviews
               ?.slice()
               .sort((a, b) => a?.createdAt!.localeCompare(b?.createdAt!))
               .map((reply) => <Reply reply={reply} key={reply.id} />)}

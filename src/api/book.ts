@@ -5,7 +5,6 @@ import {
   BookI,
   EditBookI,
   RatingI,
-  ReplyI,
   ReviewI,
   SearchI,
 } from "../interfaces";
@@ -29,8 +28,6 @@ export const editBookApi = (value: EditBookI) =>
   axios.patch(`/books/${value.bookId}`, value);
 
 export const addReviewApi = (value: AddReviewI) => axios.post("/review", value);
-
-export const addReplyApi = (value: ReplyI) => axios.post("/reply", value);
 
 export const getReviewApi = (id: number) =>
   axios.get<ReviewI[]>(`/review/${id}`);

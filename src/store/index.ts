@@ -4,6 +4,7 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { initResponseInt } from "../api/axios";
 import booksReducer from "./bookSlice";
 import loginReducer from "./loginSlice";
+import notificationReducer from "./notificationSlice";
 import signUpReducer from "./signupSlice";
 import userReducer from "./userSlice";
 
@@ -13,6 +14,7 @@ const store = configureStore({
     login: loginReducer,
     user: userReducer,
     books: booksReducer,
+    notifications: notificationReducer,
   },
 });
 

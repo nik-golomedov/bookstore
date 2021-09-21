@@ -2,8 +2,10 @@ import axios from "axios";
 
 import { clearUser } from "../store/userSlice";
 
+export const BASE_URL = "http://localhost:8000";
+
 const axiosBase = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: BASE_URL,
 });
 
 axiosBase.interceptors.request.use(
