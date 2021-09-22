@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-
 import ReactPaginate from "react-paginate";
 import styled from "styled-components";
 // @ts-ignore
 import Url from "urls-tool";
 
-import { BookI, SearchI } from "../../interfaces";
+import BookCard from "../BookCard/BookCard";
+import Spinner from "../Spinner";
+import Aside from "./components/MainPageAside";
+
 import { useAppDispatch, useAppSelector } from "../../store";
 import {
   addFilterParams,
@@ -14,9 +16,7 @@ import {
   isFetchingBooksSelector,
   totalSelector,
 } from "../../store/bookSlice";
-import BookCard from "../BookCard/BookCard";
-import Spinner from "../Spinner";
-import Aside from "./components/MainPageAside";
+import { BookI, SearchI } from "../../../interfaces";
 
 const MainPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -34,9 +34,11 @@ const MainPage: React.FC = () => {
     if (filterSearch.rating && +filterSearch.rating !== 0) {
       newFilterSearch.rating = filterSearch.rating;
     }
-    if (Array.isArray(filterSearch.price) && filterSearch.price.length !== 0) {
-      newFilterSearch.price = `${String(filterSearch.price[0])},${String(filterSearch.price[1])}`;
-    } else if (filterSearch.price && filterSearch.price.length !== 0) {
+    if (Array.isArray(filterSearch.price) && !!filterSearch.price.length) {
+      newFilterSearch.price = `${String(filterSearch.price[0])},${String(
+        filterSearch.price[1],
+      )}`;
+    } else if (filterSearch.price && !!filterSearch.price.length) {
       newFilterSearch.price = filterSearch.price;
     }
     if (filterSearch.category) newFilterSearch.category = filterSearch.category;

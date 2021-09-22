@@ -1,5 +1,6 @@
-import { SignUpFormValuesI, LoginFormValuesI } from "../interfaces";
 import axios from "./axios";
+
+import { SignUpFormValuesI, LoginFormValuesI } from "../../interfaces";
 
 export const signUpApi = (formValues: SignUpFormValuesI) =>
   axios.post("users/registration", formValues);

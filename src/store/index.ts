@@ -7,6 +7,7 @@ import loginReducer from "./loginSlice";
 import notificationReducer from "./notificationSlice";
 import signUpReducer from "./signupSlice";
 import userReducer from "./userSlice";
+import appReducer from "./appSlice";
 
 const store = configureStore({
   reducer: {
@@ -15,7 +16,12 @@ const store = configureStore({
     user: userReducer,
     books: booksReducer,
     notifications: notificationReducer,
+    app: appReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 initResponseInt(store);

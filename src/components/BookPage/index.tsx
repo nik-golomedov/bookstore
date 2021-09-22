@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
-
-import { useFormik } from "formik";
 import Rate from "rc-rate";
 import { AiOutlineStar } from "react-icons/ai";
 import { useHistory, useLocation, useParams } from "react-router-dom";
 
+import EditBook from "../EditBook";
+import Review from "./components/Comments/Review";
+import ReviewForm from "./form";
+
 import { BASE_URL } from "../../api/axios";
-import { AddReviewI, BookI, TargetUserI } from "../../interfaces";
 import { useAppDispatch, useAppSelector } from "../../store";
 import {
   addFavourites,
   addRating,
-  addReview,
   deleteFavourites,
   getBook,
   getFavourites,
@@ -28,11 +28,9 @@ import {
   isSuccessAddedReviewSelector,
 } from "../../store/bookSlice";
 import { isAuthSelector, userIdSelector } from "../../store/userSlice";
+import { BookI, TargetUserI } from "../../../interfaces";
 import StyledButton from "../../UI/buttons/styledButton";
-import { StyledForm } from "../../UI/forms/styledForm";
-import EditBook from "../EditBook";
-import Review from "./components/Comments/Review";
-import { StyledBookPage, StyledFullSizeBookCard } from "./StyledBookPage";
+import { StyledBookPage, StyledFullSizeBookCard } from "./styles";
 import "rc-rate/assets/index.css";
 
 interface MatchParams {
@@ -53,7 +51,7 @@ const BookPage: React.FC = () => {
   const book: BookI = useAppSelector(singleBookSelector);
   const isSuccessReply = useAppSelector(isSuccessAddedReplySelector);
   const isSuccessReview = useAppSelector(isSuccessAddedReviewSelector);
-  const isFavourite = useAppSelector(isFavouriteSelector(+id));
+  const isFavorite = useAppSelector(isFavouriteSelector(+id));
   const isSuccessFavourite = useAppSelector(isSuccessFavouriteSelector);
   const isSuccessDeleteFavourite = useAppSelector(
     isSuccessDeleteFavouriteSelector,
@@ -103,37 +101,6 @@ const BookPage: React.FC = () => {
     setTargetUser({ id: null, fullName: null });
   };
 
-  const formik = useFormik({
-    initialValues: {
-      text: "",
-      bookId: +id,
-      userId,
-      createdAt: "",
-    } as AddReviewI,
-    onSubmit: (values: AddReviewI) => {
-      if (!targetUser?.id) {
-        dispatch(
-          addReview({
-            ...values,
-            bookId: +id,
-            userId,
-          }),
-        );
-      } else {
-        dispatch(
-          addReview({
-            text: values.text,
-            reviewId: targetUser.reviewId!,
-            targetUserId: +targetUser.id,
-            bookId: +id,
-          }),
-        );
-      }
-      setShowReview(true);
-      formik.resetForm();
-    },
-  });
-
   useEffect(() => {
     dispatch(getReview(+id));
   }, [isSuccessReply, isSuccessReview]);
@@ -174,11 +141,14 @@ const BookPage: React.FC = () => {
               <StyledFullSizeBookCard key={book.id}>
                 <div className="book-main">
                   <div className="book-image">
-                    <img src={book.image && `${BASE_URL}/${book.image}`} alt={book.title} />
+                    <img
+                      src={book.image && `${BASE_URL}/${book.image}`}
+                      alt={book.title}
+                    />
                   </div>
                   <div className="book-section">
                     {isAuth
-                      && (isFavourite.length === 0 ? (
+                      && (isFavorite.length === 0 ? (
                         <button
                           type="button"
                           className="book-favorites"
@@ -207,11 +177,7 @@ const BookPage: React.FC = () => {
                         defaultValue={book.rating && book.rating}
                         onChange={(value) => handleRatingChange(value)}
                       />
-                      {book.rating && (
-                      <span>
-                        {book.rating.toFixed(2)}
-                      </span>
-                      ) }
+                      {book.rating && <span>{book.rating.toFixed(2)}</span>}
                       <div className="book-review__count">
                         <span>Отзывов: </span>
                         {review.length}
@@ -248,44 +214,20 @@ const BookPage: React.FC = () => {
               </StyledFullSizeBookCard>
 
               {isAuth && (
-                <StyledForm onSubmit={formik.handleSubmit} id="review">
-                  <b>Оставить отзыв:</b>
-                  <span>
-                    {targetUser?.id && (
-                      <span>
-                        {targetUser?.id ? (
-                          <span>
-                            Ответ на комментарий
-                            {" "}
-                            {targetUser?.fullName}
-                          </span>
-                        ) : null}
-                        <span role="button" tabIndex={0} onClick={cancelTargetUser}>
-                          <div className="cancel-targetuser">Отмена</div>
-                        </span>
-                      </span>
-                    )}
-                  </span>
-                  <textarea
-                    id="text"
-                    name="text"
-                    onChange={formik.handleChange}
-                    value={formik.values.text}
-                  />
-                  <StyledButton type="submit">Отправить</StyledButton>
-                </StyledForm>
+                <ReviewForm
+                  id={+id}
+                  userId={userId!}
+                  cancelTargetUser={cancelTargetUser}
+                  targetUser={targetUser}
+                  handleShowReview={handleShowReview}
+                />
               )}
+              {showReview
+                ? !!review.length && <div>Отзывы</div>
+                : book.snippet && <div>Ознакомительный фрагмент</div>}
               {showReview ? (
-                review.length !== 0 && <div>Отзывы</div>
-              ) : (
-                book.snippet && <div>Ознакомительный фрагмент</div>
-              )}
-              {showReview ? (
-                review.length !== 0 && (
-                  <Review
-                    handleClick={handleReviewClick}
-                    review={review}
-                  />
+                !!review.length && (
+                  <Review handleClick={handleReviewClick} review={review} />
                 )
               ) : (
                 <>{book.snippet && <p>{book.snippet}</p>}</>

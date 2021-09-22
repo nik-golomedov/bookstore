@@ -1,28 +1,34 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
-
 import { FiLogOut, FiLogIn } from "react-icons/fi";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { IconContext } from "react-icons/lib";
 import { Link, useHistory } from "react-router-dom";
 
-import { DataNotificationI, SocketI } from "../../interfaces";
-import { useAppDispatch, useAppSelector } from "../../store";
-import { deleteNotification, getNotification } from "../../store/notificationSlice";
-import { clearUser, isAuthSelector } from "../../store/userSlice";
-import { StyledListItem } from "../../UI/listItem/styledListItem";
 import Time from "../Time";
+
+import { useAppDispatch, useAppSelector } from "../../store";
+import {
+  deleteNotification,
+  getNotification,
+  notificationSelector,
+} from "../../store/notificationSlice";
+import { clearUser, isAuthSelector } from "../../store/userSlice";
+import { socketSelector } from "../../store/appSlice";
+import { DataNotificationI } from "../../../interfaces";
+import { StyledListItem } from "../../UI/listItem/styledListItem";
 import {
   StyledHeader,
   StyledHeaderNotification,
   StyledNotification,
-} from "./StyledHeader";
+} from "./styles";
 
-const Header: React.FC<SocketI> = ({ socket }) => {
+const Header: React.FC = () => {
   const isAuth = useAppSelector(isAuthSelector);
   const dispatch = useAppDispatch();
-  const notification = useAppSelector((state) => state.notifications && state.notifications.data);
+  const socket = useAppSelector(socketSelector);
+  const notification = useAppSelector(notificationSelector);
   const history = useHistory();
   const [isNotification, setIsNotification] = useState<boolean>(false);
   const [newNotification, setNewNotification] = useState<DataNotificationI[]>(
@@ -38,7 +44,7 @@ const Header: React.FC<SocketI> = ({ socket }) => {
 
   const handleClickNewNotification = (
     e: React.MouseEvent<HTMLDivElement>,
-    bookId:number,
+    bookId: number,
     id: number,
   ) => {
     e.stopPropagation();
@@ -96,7 +102,7 @@ const Header: React.FC<SocketI> = ({ socket }) => {
                 onClick={showNotificationWindow}
               >
                 <IoMdNotificationsOutline />
-                {newNotification.length !== 0 && (
+                {!!newNotification.length && (
                   <div className="notification-count">
                     {+newNotification.length}
                   </div>
@@ -106,7 +112,7 @@ const Header: React.FC<SocketI> = ({ socket }) => {
                 <FiLogOut onClick={handleClick} />
               </StyledListItem>
               <StyledHeaderNotification displayNone={!isNotification}>
-                {newNotification.length !== 0
+                {!!newNotification.length
                   && newNotification.map((item) => (
                     <StyledNotification key={item.id}>
                       <div

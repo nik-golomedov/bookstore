@@ -1,10 +1,10 @@
 import React from "react";
-
 import { Link } from "react-scroll";
 
-import { ReviewI } from "../../../../interfaces";
 import Time from "../../../Time";
-import StyledReview from "./StyledReview";
+
+import { ReviewI } from "../../../../../interfaces";
+import StyledReview from "./styles";
 
 interface ReplyPropsI {
   reply: ReviewI;

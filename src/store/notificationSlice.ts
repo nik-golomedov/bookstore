@@ -1,7 +1,12 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createAsyncThunk,
+  createDraftSafeSelector,
+} from "@reduxjs/toolkit";
 
 import { deleteNotificationApi, getNotificationApi } from "../api/notification";
-import { DataNotificationI } from "../interfaces";
+import { DataNotificationI } from "../../interfaces";
+import { RootState } from ".";
 
 export const getNotification = createAsyncThunk(
   "notification/getNotification",
@@ -66,3 +71,10 @@ const notificationSlice = createSlice({
 });
 
 export default notificationSlice.reducer;
+
+const notificationState = (state: RootState) => state.notifications;
+
+export const notificationSelector = createDraftSafeSelector(
+  notificationState,
+  (state) => state && state.data,
+);

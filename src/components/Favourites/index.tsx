@@ -1,15 +1,15 @@
 import React, { useEffect } from "react";
-
 import styled from "styled-components";
+
+import BookCard from "../BookCard/BookCard";
 
 import { useAppDispatch, useAppSelector } from "../../store";
 import { favListSelector, getFavourites } from "../../store/bookSlice";
 import { isAuthSelector } from "../../store/userSlice";
-import BookCard from "../BookCard/BookCard";
 
 const Favourites: React.FC = () => {
   const dispatch = useAppDispatch();
-  const favList = useAppSelector(favListSelector);
+  const favoriteList = useAppSelector(favListSelector);
   const isAuth = useAppSelector(isAuthSelector);
 
   useEffect(() => {
@@ -21,8 +21,8 @@ const Favourites: React.FC = () => {
   return (
     <StyledFavouriteBooks>
       <div className="book-container">
-        {favList.length !== 0 ? (
-          favList.map((item) => (
+        {favoriteList.length ? (
+          favoriteList.map((item) => (
             <BookCard
               id={item.id}
               image={item.image}

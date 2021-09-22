@@ -1,106 +1,19 @@
 import React from "react";
-
-import { useFormik } from "formik";
 import styled from "styled-components";
-import * as Yup from "yup";
 
-import { BookI } from "../../interfaces";
-import { useAppDispatch } from "../../store";
-import { editBook } from "../../store/bookSlice";
-import StyledButton from "../../UI/buttons/styledButton";
-import { StyledForm } from "../../UI/forms/styledForm";
+import EditBookForm from "./form";
 
-interface EditBookPropsI {
-  id: number;
-  onChange: () => void;
-  book: BookI;
-}
-
-interface initialEditValues {
-  description: string;
-  price: number;
-  snippet: string;
-}
+import { EditBookPropsI } from "../../../interfaces";
 
 const EditBook: React.FC<EditBookPropsI> = ({
   id,
   onChange,
   book,
-}: EditBookPropsI) => {
-  const dispatch = useAppDispatch();
-  const initialValues: initialEditValues = {
-    description: String(book.description),
-    price: Number(book.price),
-    snippet: (!book.snippet) ? "" : book.snippet,
-  };
-
-  const formik = useFormik({
-    initialValues,
-    validationSchema: Yup.object({
-      description: Yup.string().required("Обязательное поле"),
-      price: Yup.number()
-        .min(1, "Минимальная допустимая цена 1")
-        .max(9999999, "Максимальная допустимая цена 9999999")
-        .required("Обязательное поле"),
-    }),
-    onSubmit: (values: {
-      description: string;
-      snippet: string;
-      price: number;
-    }) => {
-      dispatch(editBook({ ...values, bookId: id }));
-      onChange();
-    },
-  });
-
-  const handleOnBlur = (
-    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    formik.setFieldValue(e.target.name, e.target.value.trim());
-    formik.handleBlur(e);
-  };
-
-  return (
-    <StyledEditBook>
-      <StyledForm smallWidth onSubmit={formik.handleSubmit}>
-        <label htmlFor="description">Описание</label>
-        <textarea
-          id="description"
-          name="description"
-          onChange={formik.handleChange}
-          onBlur={handleOnBlur}
-          value={formik.values.description}
-        />
-        {formik.touched.description && formik.errors.description && (
-          <div>{formik.errors.description}</div>
-        )}
-        <label htmlFor="price">Цена</label>
-        <input
-          id="price"
-          name="price"
-          type="number"
-          min="1"
-          max="9999999"
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values.price}
-        />
-        {formik.touched.price && formik.errors.price && (
-          <div>{formik.errors.price}</div>
-        )}
-        <label htmlFor="snippet">Ознакомительный фрагмент</label>
-        <textarea
-          id="snippet"
-          name="snippet"
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values.snippet}
-        />
-        <StyledButton type="submit">Добавить</StyledButton>
-      </StyledForm>
-    </StyledEditBook>
-  );
-};
+}: EditBookPropsI) => (
+  <StyledEditBook>
+    <EditBookForm id={id} onChange={onChange} book={book} />
+  </StyledEditBook>
+);
 
 export default EditBook;
 

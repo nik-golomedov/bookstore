@@ -117,10 +117,6 @@ export interface SearchI {
   page?: number;
 }
 
-export interface SocketI {
-  socket: Socket | null;
-}
-
 export interface SignUpFormValuesI {
   fullName: string;
   email: string;
@@ -135,4 +131,10 @@ export interface DataNotificationI {
   type: string;
   bookId?: number;
   createdAt?: string;
+}
+
+export interface EditBookPropsI {
+  id: number;
+  onChange: () => void;
+  book: BookI;
 }

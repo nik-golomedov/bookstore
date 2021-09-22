@@ -1,3 +1,5 @@
+import axios from "./axios";
+
 import {
   AddCategoryI,
   AddFavI,
@@ -7,19 +9,22 @@ import {
   RatingI,
   ReviewI,
   SearchI,
-} from "../interfaces";
-import axios from "./axios";
+} from "../../interfaces";
 
 export const addBookApi = (formData: FormData) =>
   axios.post("/books", formData);
 
 export const getBooksApi = ({
   newFilterSearch,
+  offset,
+  limit,
 }: {
   newFilterSearch: SearchI;
+  offset: number;
+  limit: number;
 }) =>
   axios.get("/books", {
-    params: { ...newFilterSearch },
+    params: { ...newFilterSearch, offset, limit },
   });
 
 export const getBookApi = (id: number) => axios.get<BookI>(`/books/${id}`);

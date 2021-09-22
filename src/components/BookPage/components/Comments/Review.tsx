@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-
 import { Link } from "react-scroll";
 import styled from "styled-components";
 
-import { ReviewI, TargetUserI } from "../../../../interfaces";
 import Time from "../../../Time";
 import Reply from "./Reply";
-import StyledReview from "./StyledReview";
+
+import { ReviewI, TargetUserI } from "../../../../../interfaces";
+import StyledReview from "./styles";
 
 interface ReviewPropsI {
   review: ReviewI[];
@@ -47,7 +47,7 @@ const Review: React.FC<ReviewPropsI> = ({
               </div>
             </div>
             <div>{item.text}</div>
-            { item?.user?.id && (
+            {item?.user?.id && (
               <Link to="review" activeClass="active" offset={-200} spy smooth>
                 <div
                   role="button"
@@ -66,7 +66,7 @@ const Review: React.FC<ReviewPropsI> = ({
               </Link>
             )}
           </StyledReview>
-          {item.reviews?.length !== 0 && (
+          {!!item.reviews?.length && (
             <StyledShowReply onClick={() => handleShowReplyClick(index)}>
               {!editIndex?.includes(index) ? (
                 <span>

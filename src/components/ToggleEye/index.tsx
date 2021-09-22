@@ -1,5 +1,4 @@
 import React from "react";
-
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
 interface ToggleEyePropsI {

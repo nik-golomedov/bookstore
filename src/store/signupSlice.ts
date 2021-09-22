@@ -4,9 +4,9 @@ import {
   createDraftSafeSelector,
 } from "@reduxjs/toolkit";
 
-import { RootState } from ".";
 import { signUpApi } from "../api/auth";
-import { SignUpFormValuesI, InitialStateSignI } from "../interfaces";
+import { RootState } from ".";
+import { SignUpFormValuesI, InitialStateSignI } from "../../interfaces";
 
 export const signUpUser = createAsyncThunk(
   "signUp/signUpUser",

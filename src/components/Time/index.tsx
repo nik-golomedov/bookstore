@@ -1,5 +1,4 @@
 import React from "react";
-
 import { formatDistanceToNow, parseISO } from "date-fns";
 
 type TimePropsType = {

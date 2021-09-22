@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import {
   createSlice,
   createAsyncThunk,
@@ -6,7 +5,6 @@ import {
   createDraftSafeSelector,
 } from "@reduxjs/toolkit";
 
-import { RootState } from ".";
 import {
   addBookApi,
   addCategoryApi,
@@ -21,6 +19,7 @@ import {
   getFavouritesApi,
   getReviewApi,
 } from "../api/book";
+import { RootState } from ".";
 import {
   AddCategoryI,
   AddFavI,
@@ -32,7 +31,7 @@ import {
   RatingI,
   ReviewI,
   SearchI,
-} from "../interfaces";
+} from "../../interfaces";
 
 interface DataI {
   books: Array<BookI>;
@@ -100,7 +99,11 @@ export const getBooks = createAsyncThunk(
   "book/getBooks",
   async ({ newFilterSearch }: { newFilterSearch: SearchI }, thunkAPI) => {
     try {
-      const response = await getBooksApi({ newFilterSearch });
+      const response = await getBooksApi({
+        newFilterSearch,
+        offset: 8,
+        limit: 8,
+      });
       return response && (response.data as DataI);
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);

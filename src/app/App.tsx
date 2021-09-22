@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Redirect,
 } from "react-router-dom";
-import { io, Socket } from "socket.io-client";
+import { io } from "socket.io-client";
 
 import AddBook from "../components/AddBook";
 import AddCategory from "../components/AddCategory";
@@ -21,7 +20,9 @@ import Spinner from "../components/Spinner";
 import UserProfile from "../components/UserProfile";
 import ProtectedRoute from "../routes/ProtectedRoute";
 import SignRoute from "../routes/SignRoute";
+
 import { useAppDispatch, useAppSelector } from "../store";
+import { addSocket, socketSelector } from "../store/appSlice";
 import {
   getUserProfile,
   isAuthSelector,
@@ -32,7 +33,7 @@ import "./App.css";
 
 const App: React.FC = () => {
   const [initialize, setInitialize] = useState<boolean>(false);
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const socket = useAppSelector(socketSelector);
   const dispatch = useAppDispatch();
   const isSuccessUser = useAppSelector(isSuccessUserSelector);
   const isErrorUser = useAppSelector(isErrorUserSelector);
@@ -41,7 +42,7 @@ const App: React.FC = () => {
   useEffect(() => {
     if (isAuth) {
       const socketIO = io("http://localhost:8000", { forceNew: true });
-      setSocket(socketIO);
+      dispatch(addSocket(socketIO));
       socketIO?.on("connect", () => {
 
       });
@@ -69,18 +70,18 @@ const App: React.FC = () => {
       <Router>
         {initialize ? (
           <>
-            <Header socket={socket} />
+            <Header />
             <NavBar />
             <Switch>
               <SignRoute path="/signup" exact component={SignUp} />
               <SignRoute
                 path="/login"
                 exact
-                component={() => <Login socket={socket} />}
+                component={() => <Login />}
               />
               <ProtectedRoute path="/profile" exact component={UserProfile} />
               <ProtectedRoute path="/add-book" exact component={AddBook} />
-              <ProtectedRoute path="/favourite" exact component={Favourites} />
+              <ProtectedRoute path="/favorite" exact component={Favourites} />
               <ProtectedRoute
                 path="/add-category"
                 exact

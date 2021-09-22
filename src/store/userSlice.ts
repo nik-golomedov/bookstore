@@ -4,9 +4,9 @@ import {
   createDraftSafeSelector,
 } from "@reduxjs/toolkit";
 
-import { RootState } from ".";
 import { getUserProfileApi } from "../api/auth";
-import { UserI } from "../interfaces";
+import { RootState } from ".";
+import { UserI } from "../../interfaces";
 
 export const getUserProfile = createAsyncThunk(
   "user/getUserProfile",

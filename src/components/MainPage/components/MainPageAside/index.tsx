@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
-
-import { useFormik } from "formik";
 import Rate from "rc-rate";
 import { Range } from "rc-slider";
 import styled from "styled-components";
 // @ts-ignore
 import Url from "urls-tool";
 
-import { SearchI } from "../../../../interfaces";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
   addFilterParams,
@@ -16,10 +13,11 @@ import {
   getBooks,
   getCategory,
 } from "../../../../store/bookSlice";
+import { SearchI } from "../../../../../interfaces";
+import StyledButton from "../../../../UI/buttons/styledButton";
 import "react-input-range/lib/css/index.css";
 import "rc-slider/assets/index.css";
 import "rc-rate/assets/index.css";
-import StyledButton from "../../../../UI/buttons/styledButton";
 
 interface AsidePropsI {
   handleOrderResetClick: () => void;
@@ -40,20 +38,14 @@ const MainPageAside: React.FC<AsidePropsI> = ({
   const category = useAppSelector(categorySelector);
   const filterSearch = useAppSelector(filterSelector);
   const { params } = Url;
-  const initialValues: SearchI = {
-    author: params.author ? params.author : "",
-    category: params.category ? params.category : "",
-  };
+  const [categoryValue, setCategoryValue] = useState<string>(
+    params.category ? params.category : "",
+  );
+  const [authorValue, setAuthorValue] = useState<string>(
+    params.author ? params.author : "",
+  );
 
   const clearFilter = () => {
-    // const newFilterSearch:SearchI = {
-    //   author: "",
-    //   price: [],
-    //   rating: "",
-    //   category: "",
-    //   order: "",
-    //   page: 0,
-    // };
     dispatch(
       addFilterParams({
         author: "",
@@ -64,8 +56,8 @@ const MainPageAside: React.FC<AsidePropsI> = ({
         page: 0,
       }),
     );
-    formik.values.author = "";
-    formik.values.category = "";
+    setAuthorValue("");
+    setCategoryValue("");
     setRangeValue([1, 100000]);
     setRatingValue(0);
     Url.params = {};
@@ -82,13 +74,17 @@ const MainPageAside: React.FC<AsidePropsI> = ({
     setRangeValue(value);
   };
 
-  const formik = useFormik({
-    initialValues,
-    onSubmit: (values: SearchI) => {
-      dispatch(addFilterParams(values));
-      setCount(!count);
-    },
-  });
+  const handleSubmit = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    dispatch(addFilterParams({ author: authorValue, category: categoryValue }));
+    setCount(!count);
+  };
+  const handleAuthorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAuthorValue(e.target.value);
+  };
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCategoryValue(e.target.value);
+  };
 
   useEffect(() => {
     dispatch(getCategory());
@@ -118,14 +114,14 @@ const MainPageAside: React.FC<AsidePropsI> = ({
   return (
     <StyledAside>
       Фильтрация
-      <form onSubmit={formik.handleSubmit}>
+      <div>
         <div className="category-filter">
           <label htmlFor="category">По категории</label>
           <select
             id="category"
             name="category"
-            onChange={formik.handleChange}
-            value={formik.values.category}
+            onChange={(e) => handleCategoryChange(e)}
+            value={categoryValue}
           >
             <option value="" label="Все" />
             {Array.isArray(category)
@@ -148,7 +144,7 @@ const MainPageAside: React.FC<AsidePropsI> = ({
             min={1}
             value={rangeValue}
             onChange={(value) => handleRangeChange(value)}
-            max={999999}
+            max={99999}
             count={10}
           />
         </div>
@@ -158,8 +154,8 @@ const MainPageAside: React.FC<AsidePropsI> = ({
             id="author"
             name="author"
             type="text"
-            value={formik.values.author}
-            onChange={formik.handleChange}
+            value={authorValue}
+            onChange={(e) => handleAuthorChange(e)}
           />
         </div>
         По рейтингу
@@ -172,14 +168,18 @@ const MainPageAside: React.FC<AsidePropsI> = ({
           />
         </div>
         <div>
-          <StyledButton widthSmall type="submit">
+          <StyledButton
+            widthSmall
+            type="submit"
+            onClick={(e) => handleSubmit(e)}
+          >
             Поиск
           </StyledButton>
           <StyledButton widthSmall type="button" onClick={clearFilter}>
             Сброс
           </StyledButton>
         </div>
-      </form>
+      </div>
     </StyledAside>
   );
 };
@@ -207,7 +207,7 @@ const StyledAside = styled.aside`
     margin-bottom: 10px;
   }
   button {
-    margin-top:20px;
+    margin-top: 20px;
   }
   .rc-rate-star {
     color: grey;

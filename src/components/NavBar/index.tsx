@@ -1,5 +1,4 @@
 import React from "react";
-
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
@@ -20,7 +19,7 @@ const NavBar: React.FC = () => {
           <Link to="/profile">
             <StyledListItem>Профиль пользователя</StyledListItem>
           </Link>
-          <Link to="/favourite">
+          <Link to="/favorite">
             <StyledListItem>Избранное</StyledListItem>
           </Link>
         </>
